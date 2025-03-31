@@ -1,0 +1,83 @@
+std::vector<uint32_t> computeHistogram(const TiFF& img, int num_bins = 256) {
+    std::vector<uint32_t> histogram(num_bins, 0);
+
+    uint32_t width = img.getWidth();
+    uint32_t height = img.getHeight();
+
+    for (uint32_t y = 0; y < height; ++y) {
+        for (uint32_t x = 0; x < width; ++x) {
+            float val = img.getPixel(x, y);
+            val = std::clamp(val, 0.0f, 1.0f);  // sécurité
+
+            int bin = static_cast<int>(val * (num_bins - 1));
+            histogram[bin]++;
+        }
+    }
+
+    return histogram;
+}
+
+void saveHistogramCSV(const std::vector<uint32_t>& hist, const std::string& filename) {
+    std::ofstream out(filename);
+    if (!out.is_open()) {
+        std::cerr << "Erreur : impossible d'écrire dans " << filename << std::endl;
+        return;
+    }
+
+    for (size_t i = 0; i < hist.size(); ++i) {
+        float intensity = static_cast<float>(i) / (hist.size() - 1);
+        out << intensity << "," << hist[i] << "\n";
+    }
+
+    out.close();
+}
+
+✅ Image float32 grayscale ∈ [0, 1]
+🔹 Objectif : Créer un histogramme
+On doit :
+
+Diviser l'intervalle [0.0 ; 1.0] en N bins (par ex. 256)
+
+Pour chaque pixel :
+
+S'assurer qu'il est bien dans [0;1] (au cas où)
+
+Convertir la valeur en un index de bin :
+
+bin
+=
+⌊
+valeur
+×
+(
+𝑁
+−
+1
+)
+⌋
+bin=⌊valeur×(N−1)⌋
+💡 Pourquoi val * (N - 1) ?
+Car on veut que :
+
+val = 0.0 tombe dans bin = 0
+
+val = 1.0 tombe dans bin = N - 1
+
+
+🔍 Pourquoi 256 bins pour un histogramme, même avec une image en float32 normalisée en [0, 1] ?
+💡 1. Par convention historique
+256 est le nombre de niveaux de gris dans une image 8 bits (2⁸ = 256).
+
+Même si ton image est en float32, l'œil humain ne perçoit pas 16 millions de niveaux de gris… donc 256 bins donnent une bonne représentation visuelle.
+
+💡 2. Équilibre entre résolution et lisibilité
+Si tu mets trop peu de bins (ex: 16), tu perds de l'information.
+
+Si tu mets trop de bins (ex: 10 000), tu auras beaucoup de bins vides, ce sera bruité, illisible.
+
+💡 3. Tu peux adapter le nombre de bins selon le contexte :
+Type d'image	Nombre de bins conseillé
+8 bits	256 (correspond aux valeurs entières 0–255)
+32 bits float normalisé	256 ou 512 ou 1024 selon la précision voulue
+Analyse fine / scientifique	1024, 2048, voire plus
+Visualisation simple	256 (standard, suffisant)

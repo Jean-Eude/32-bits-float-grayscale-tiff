@@ -1,0 +1,88 @@
+#include <cmath>
+#include <algorithm>
+#include <vector>
+#include <iostream>
+#include <string>
+#include "tiffio.h"
+
+class TiFF {
+public:
+    TiFF() : width(0), height(0) {}
+
+    bool load(const std::string& filename);
+    bool save(const std::string& filename) const;
+    bool create(uint32_t w, uint32_t h, float initial_value = 0.0f);
+    float getPixel(uint32_t x, uint32_t y) const;
+    void setPixel(uint32_t x, uint32_t y, float value);
+    uint32_t getWidth() const { return width; }
+    uint32_t getHeight() const { return height; }
+
+private:
+    uint32_t width, height;
+    std::vector<float> data;
+};
+
+TiFF resizeByArea(const TiFF& src, uint32_t new_width, uint32_t new_height) {
+    TiFF dst;
+    dst.create(new_width, new_height);
+
+    float scale_x = static_cast<float>(src.getWidth()) / new_width;
+    float scale_y = static_cast<float>(src.getHeight()) / new_height;
+
+    for (uint32_t y = 0; y < new_height; ++y) {
+        for (uint32_t x = 0; x < new_width; ++x) {
+            float src_x0 = x * scale_x;
+            float src_y0 = y * scale_y;
+            float src_x1 = (x + 1) * scale_x;
+            float src_y1 = (y + 1) * scale_y;
+
+            int x0 = static_cast<int>(std::floor(src_x0));
+            int y0 = static_cast<int>(std::floor(src_y0));
+            int x1 = static_cast<int>(std::ceil(src_x1));
+            int y1 = static_cast<int>(std::ceil(src_y1));
+
+            float sum = 0.0f;
+            float total_weight = 0.0f;
+
+            for (int sy = y0; sy < y1; ++sy) {
+                for (int sx = x0; sx < x1; ++sx) {
+                    float ix0 = std::max(src_x0, static_cast<float>(sx));
+                    float iy0 = std::max(src_y0, static_cast<float>(sy));
+                    float ix1 = std::min(src_x1, static_cast<float>(sx + 1));
+                    float iy1 = std::min(src_y1, static_cast<float>(sy + 1));
+
+                    float area = std::max(0.0f, ix1 - ix0) * std::max(0.0f, iy1 - iy0);
+                    float val = src.getPixel(sx, sy);
+
+                    sum += val * area;
+                    total_weight += area;
+                }
+            }
+
+            dst.setPixel(x, y, (total_weight > 0.0f) ? (sum / total_weight) : 0.0f);
+        }
+    }
+
+    return dst;
+}
+
+int main() {
+    TiFF input;
+    if (!input.load("input.tiff")) {
+        std::cerr << "Erreur lors du chargement de l'image." << std::endl;
+        return 1;
+    }
+
+    uint32_t new_width = input.getWidth() / 2;
+    uint32_t new_height = input.getHeight() / 2;
+
+    TiFF resized = resizeByArea(input, new_width, new_height);
+
+    if (!resized.save("resized_area.tiff")) {
+        std::cerr << "Erreur lors de la sauvegarde." << std::endl;
+        return 1;
+    }
+
+    std::cout << "Redimensionnement par aire termine. Image sauvee dans resized_area.tiff" << std::endl;
+    return 0;
+}

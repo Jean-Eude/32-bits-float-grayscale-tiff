@@ -1,0 +1,63 @@
+#include <cmath>
+
+float computePSNR(const TiFF& img1, const TiFF& img2) {
+    if (img1.getWidth() != img2.getWidth() || img1.getHeight() != img2.getHeight()) return -1;
+
+    double mse = 0.0;
+    uint32_t width = img1.getWidth(), height = img1.getHeight();
+
+    for (uint32_t y = 0; y < height; ++y) {
+        for (uint32_t x = 0; x < width; ++x) {
+            float diff = img1.getPixel(x, y) - img2.getPixel(x, y);
+            mse += diff * diff;
+        }
+    }
+
+    mse /= (width * height);
+    if (mse == 0.0) return INFINITY;
+
+    return 10.0f * std::log10(1.0 / mse);  // MAX_I = 1.0
+}
+
+float computeSSIM(const TiFF& img1, const TiFF& img2) {
+    if (img1.getWidth() != img2.getWidth() || img1.getHeight() != img2.getHeight()) return -1;
+
+    double mu_x = 0, mu_y = 0;
+    double sigma_x = 0, sigma_y = 0, sigma_xy = 0;
+    uint32_t width = img1.getWidth(), height = img1.getHeight();
+    uint64_t N = width * height;
+
+    for (uint32_t y = 0; y < height; ++y) {
+        for (uint32_t x = 0; x < width; ++x) {
+            float px1 = img1.getPixel(x, y);
+            float px2 = img2.getPixel(x, y);
+            mu_x += px1;
+            mu_y += px2;
+        }
+    }
+
+    mu_x /= N;
+    mu_y /= N;
+
+    for (uint32_t y = 0; y < height; ++y) {
+        for (uint32_t x = 0; x < width; ++x) {
+            float px1 = img1.getPixel(x, y);
+            float px2 = img2.getPixel(x, y);
+            sigma_x += (px1 - mu_x) * (px1 - mu_x);
+            sigma_y += (px2 - mu_y) * (px2 - mu_y);
+            sigma_xy += (px1 - mu_x) * (px2 - mu_y);
+        }
+    }
+
+    sigma_x /= N;
+    sigma_y /= N;
+    sigma_xy /= N;
+
+    const float C1 = 0.01f * 0.01f;
+    const float C2 = 0.03f * 0.03f;
+
+    double numerator = (2 * mu_x * mu_y + C1) * (2 * sigma_xy + C2);
+    double denominator = (mu_x * mu_x + mu_y * mu_y + C1) * (sigma_x + sigma_y + C2);
+
+    return static_cast<float>(numerator / denominator);
+}

@@ -1,0 +1,169 @@
+#include <cmath>
+#include <algorithm>
+#include <vector>
+#include <iostream>
+#include <string>
+#include "tiffio.h"
+
+class TiFF {
+public:
+    TiFF() : width(0), height(0) {}
+
+    bool load(const std::string& filename);
+    bool save(const std::string& filename) const;
+    bool create(uint32_t w, uint32_t h, float initial_value = 0.0f);
+    float getPixel(uint32_t x, uint32_t y) const;
+    void setPixel(uint32_t x, uint32_t y, float value);
+    uint32_t getWidth() const { return width; }
+    uint32_t getHeight() const { return height; }
+
+private:
+    uint32_t width, height;
+    std::vector<float> data;
+};
+
+TiFF resizeByArea(const TiFF& src, uint32_t new_width, uint32_t new_height) {
+    TiFF dst;
+    dst.create(new_width, new_height);
+
+    float scale_x = static_cast<float>(src.getWidth()) / new_width;
+    float scale_y = static_cast<float>(src.getHeight()) / new_height;
+
+    for (uint32_t y = 0; y < new_height; ++y) {
+        for (uint32_t x = 0; x < new_width; ++x) {
+            float src_x0 = x * scale_x;
+            float src_y0 = y * scale_y;
+            float src_x1 = (x + 1) * scale_x;
+            float src_y1 = (y + 1) * scale_y;
+
+            int x0 = static_cast<int>(std::floor(src_x0));
+            int y0 = static_cast<int>(std::floor(src_y0));
+            int x1 = static_cast<int>(std::ceil(src_x1));
+            int y1 = static_cast<int>(std::ceil(src_y1));
+
+            float sum = 0.0f;
+            float total_weight = 0.0f;
+
+            for (int sy = y0; sy < y1; ++sy) {
+                for (int sx = x0; sx < x1; ++sx) {
+                    float ix0 = std::max(src_x0, static_cast<float>(sx));
+                    float iy0 = std::max(src_y0, static_cast<float>(sy));
+                    float ix1 = std::min(src_x1, static_cast<float>(sx + 1));
+                    float iy1 = std::min(src_y1, static_cast<float>(sy + 1));
+
+                    float area = std::max(0.0f, ix1 - ix0) * std::max(0.0f, iy1 - iy0);
+                    float val = src.getPixel(sx, sy);
+
+                    sum += val * area;
+                    total_weight += area;
+                }
+            }
+
+            dst.setPixel(x, y, (total_weight > 0.0f) ? (sum / total_weight) : 0.0f);
+        }
+    }
+
+    return dst;
+}
+
+float cubicInterpolate(float v0, float v1, float v2, float v3, float x) {
+    return v1 + 0.5f * x * (v2 - v0 + x * (2.0f * v0 - 5.0f * v1 + 4.0f * v2 - v3 + x * (3.0f * (v1 - v2) + v3 - v0)));
+}
+
+float getPixelSafe(const TiFF& img, int x, int y) {
+    x = std::clamp(x, 0, static_cast<int>(img.getWidth()) - 1);
+    y = std::clamp(y, 0, static_cast<int>(img.getHeight()) - 1);
+    return img.getPixel(x, y);
+}
+
+TiFF resizeBilinear(const TiFF& src, uint32_t new_width, uint32_t new_height) {
+    TiFF dst;
+    dst.create(new_width, new_height);
+
+    float scale_x = static_cast<float>(src.getWidth()) / new_width;
+    float scale_y = static_cast<float>(src.getHeight()) / new_height;
+
+    for (uint32_t y = 0; y < new_height; ++y) {
+        for (uint32_t x = 0; x < new_width; ++x) {
+            float gx = x * scale_x;
+            float gy = y * scale_y;
+
+            int x0 = static_cast<int>(gx);
+            int y0 = static_cast<int>(gy);
+            int x1 = std::min(x0 + 1, static_cast<int>(src.getWidth()) - 1);
+            int y1 = std::min(y0 + 1, static_cast<int>(src.getHeight()) - 1);
+
+            float dx = gx - x0;
+            float dy = gy - y0;
+
+            float v00 = src.getPixel(x0, y0);
+            float v01 = src.getPixel(x0, y1);
+            float v10 = src.getPixel(x1, y0);
+            float v11 = src.getPixel(x1, y1);
+
+            float val = (1 - dx) * (1 - dy) * v00 + dx * (1 - dy) * v10 + (1 - dx) * dy * v01 + dx * dy * v11;
+            dst.setPixel(x, y, val);
+        }
+    }
+
+    return dst;
+}
+
+TiFF resizeBicubic(const TiFF& src, uint32_t new_width, uint32_t new_height) {
+    TiFF dst;
+    dst.create(new_width, new_height);
+
+    float scale_x = static_cast<float>(src.getWidth()) / new_width;
+    float scale_y = static_cast<float>(src.getHeight()) / new_height;
+
+    for (uint32_t y = 0; y < new_height; ++y) {
+        for (uint32_t x = 0; x < new_width; ++x) {
+            float gx = x * scale_x;
+            float gy = y * scale_y;
+
+            int ix = static_cast<int>(gx);
+            int iy = static_cast<int>(gy);
+
+            float dx = gx - ix;
+            float dy = gy - iy;
+
+            float patch[4][4];
+            for (int m = -1; m <= 2; ++m) {
+                for (int n = -1; n <= 2; ++n) {
+                    patch[m + 1][n + 1] = getPixelSafe(src, ix + n, iy + m);
+                }
+            }
+
+            float col[4];
+            for (int i = 0; i < 4; ++i) {
+                col[i] = cubicInterpolate(patch[i][0], patch[i][1], patch[i][2], patch[i][3], dx);
+            }
+            float value = cubicInterpolate(col[0], col[1], col[2], col[3], dy);
+            dst.setPixel(x, y, value);
+        }
+    }
+
+    return dst;
+}
+
+int main() {
+    TiFF input;
+    if (!input.load("input.tiff")) {
+        std::cerr << "Erreur lors du chargement de l'image." << std::endl;
+        return 1;
+    }
+
+    uint32_t new_width = input.getWidth() / 2;
+    uint32_t new_height = input.getHeight() / 2;
+
+    TiFF reduced = resizeByArea(input, new_width, new_height);
+    TiFF restored_bilinear = resizeBilinear(reduced, input.getWidth(), input.getHeight());
+    TiFF restored_bicubic = resizeBicubic(reduced, input.getWidth(), input.getHeight());
+
+    reduced.save("reduced_area.tiff");
+    restored_bilinear.save("restored_bilinear.tiff");
+    restored_bicubic.save("restored_bicubic.tiff");
+
+    std::cout << "Redimensionnements termines." << std::endl;
+    return 0;
+}
