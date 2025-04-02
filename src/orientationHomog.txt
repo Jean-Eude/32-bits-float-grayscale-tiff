@@ -3,10 +3,17 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <numeric>
+#include <stdexcept>
 
 class TiFF {
 public:
     TiFF() : width(0), height(0) {}
+
+    enum class Orientation {
+        Horizontal,
+        Vertical
+    };
 
     bool load(const std::string& filename) {
         TIFF* tif = TIFFOpen(filename.c_str(), "r");
@@ -48,6 +55,11 @@ public:
     }
 
     bool save(const std::string& filename) const {
+        if (width == 0 || height == 0 || data.empty()) {
+            std::cerr << "Erreur : image vide, rien à sauvegarder." << std::endl;
+            return false;
+        }
+
         TIFF* tif = TIFFOpen(filename.c_str(), "w");
         if (!tif) {
             std::cerr << "Erreur : impossible de créer le fichier : " << filename << std::endl;
@@ -114,9 +126,48 @@ public:
     void clear() {
         width = 0;
         height = 0;
-        std::vector<float>().swap(data); // échange avec un vecteur vide → libération immédiate
+        std::vector<float>().swap(data); // Libère la mémoire
     }
-    
+
+    Orientation detectBandOrientation() const {
+        if (width == 0 || height == 0 || data.empty()) {
+            throw std::runtime_error("Image vide, impossible de détecter l'orientation.");
+        }
+
+        float row_var_sum = 0.0f;
+        for (uint32_t y = 0; y < height; ++y) {
+            float sum = 0.0f, sum_sq = 0.0f;
+            for (uint32_t x = 0; x < width; ++x) {
+                float val = getPixel(x, y);
+                sum += val;
+                sum_sq += val * val;
+            }
+            float mean = sum / width;
+            float var = (sum_sq / width) - (mean * mean);
+            row_var_sum += var;
+        }
+        row_var_sum /= height;
+
+        float col_var_sum = 0.0f;
+        for (uint32_t x = 0; x < width; ++x) {
+            float sum = 0.0f, sum_sq = 0.0f;
+            for (uint32_t y = 0; y < height; ++y) {
+                float val = getPixel(x, y);
+                sum += val;
+                sum_sq += val * val;
+            }
+            float mean = sum / height;
+            float var = (sum_sq / height) - (mean * mean);
+            col_var_sum += var;
+        }
+        col_var_sum /= width;
+
+        return (col_var_sum > row_var_sum) ? Orientation::Vertical : Orientation::Horizontal;
+    }
+
+    std::string getOrientationString(Orientation o) const {
+        return (o == Orientation::Vertical) ? "Verticale" : "Horizontale";
+    }
 
     uint32_t getWidth() const { return width; }
     uint32_t getHeight() const { return height; }
@@ -125,26 +176,3 @@ private:
     uint32_t width, height;
     std::vector<float> data;
 };
-
-int main() {
-    TiFF image;
-
-    if (image.load("output_laplacian_trame.tiff")) {
-        std::cout << "Image chargée : " << image.getWidth() << "x" << image.getHeight() << std::endl;
-
-        image.normalize();
-        std::cout << "Image normalisée." << std::endl;
-
-        if (image.save("output_normalized.tif")) {
-            std::cout << "Image sauvegardée dans 'output_normalized.tif'." << std::endl;
-        }
-
-        image.clear();
-        std::cout << "Image effacée. Dimensions : " << image.getWidth() << "x" << image.getHeight() << std::endl;
-    } else {
-        std::cerr << "Échec du chargement de l'image." << std::endl;
-    }
-
-    return 0;
-}
-

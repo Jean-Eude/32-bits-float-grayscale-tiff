@@ -1,0 +1,87 @@
+🛠️ 2. Version de GCC trop ancienne
+Vérifie ta version :
+
+bash
+Copier
+Modifier
+g++ --version
+Si tu es en dessous de GCC 8, la prise en charge est partielle, parfois instable → → segfault possible dès l’appel.
+
+
+#include <iostream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
+int main() {
+    std::string path = "./mon_dossier";
+
+    if (!fs::exists(path)) {
+        std::cerr << "Dossier inexistant.\n";
+        return 1;
+    }
+
+    for (const auto& entry : fs::recursive_directory_iterator(path)) {
+        std::cout << entry.path() << '\n';
+    }
+
+    return 0;
+}
+
+Tu peux obtenir l’extension d’un fichier très facilement avec std::filesystem :
+
+✅ Exemple simple :
+cpp
+Copier
+Modifier
+#include <iostream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
+int main() {
+    fs::path fichier("image.tif");
+
+    std::cout << "Extension : " << fichier.extension() << '\n'; // Affiche : .tif
+
+    return 0;
+}
+
+
+✅ Lecture des permissions
+Voici comment lire les permissions d’un fichier ou dossier :
+
+cpp
+Copier
+Modifier
+#include <filesystem>
+#include <iostream>
+
+namespace fs = std::filesystem;
+
+int main() {
+    fs::path path = "ton_fichier_ou_dossier";
+
+    try {
+        fs::perms p = fs::status(path).permissions();
+
+        std::cout << "Permissions :\n";
+        std::cout << ((p & fs::perms::owner_read) != fs::perms::none ? "r" : "-");
+        std::cout << ((p & fs::perms::owner_write) != fs::perms::none ? "w" : "-");
+        std::cout << ((p & fs::perms::owner_exec) != fs::perms::none ? "x" : "-");
+
+        std::cout << ((p & fs::perms::group_read) != fs::perms::none ? "r" : "-");
+        std::cout << ((p & fs::perms::group_write) != fs::perms::none ? "w" : "-");
+        std::cout << ((p & fs::perms::group_exec) != fs::perms::none ? "x" : "-");
+
+        std::cout << ((p & fs::perms::others_read) != fs::perms::none ? "r" : "-");
+        std::cout << ((p & fs::perms::others_write) != fs::perms::none ? "w" : "-");
+        std::cout << ((p & fs::perms::others_exec) != fs::perms::none ? "x" : "-");
+
+        std::cout << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Erreur : " << e.what() << std::endl;
+    }
+
+    return 0;
+}

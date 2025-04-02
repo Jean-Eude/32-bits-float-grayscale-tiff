@@ -1,0 +1,187 @@
+std::vector<float> averageProfileX(const TiFF& img) {
+    std::vector<float> profile(img.getWidth(), 0.0f);
+    for (uint32_t x = 0; x < img.getWidth(); ++x) {
+        float sum = 0.0f;
+        for (uint32_t y = 0; y < img.getHeight(); ++y) {
+            sum += img.getPixel(x, y);
+        }
+        profile[x] = sum / img.getHeight();
+    }
+    return profile;
+}
+
+std::vector<float> averageProfileY(const TiFF& img) {
+    std::vector<float> profile(img.getHeight(), 0.0f);
+    for (uint32_t y = 0; y < img.getHeight(); ++y) {
+        float sum = 0.0f;
+        for (uint32_t x = 0; x < img.getWidth(); ++x) {
+            sum += img.getPixel(x, y);
+        }
+        profile[y] = sum / img.getWidth();
+    }
+    return profile;
+}
+
+int findBestShift(const std::vector<float>& ref, const std::vector<float>& def, int max_shift = 50) {
+    int best_shift = 0;
+    float best_score = -1e9;
+
+    for (int shift = -max_shift; shift <= max_shift; ++shift) {
+        float score = 0.0f;
+        for (size_t i = 0; i < ref.size(); ++i) {
+            int j = int(i) + shift;
+            if (j >= 0 && j < int(def.size())) {
+                score += ref[i] * def[j];
+            }
+        }
+        if (score > best_score) {
+            best_score = score;
+            best_shift = shift;
+        }
+    }
+
+    return best_shift;
+}
+
+std::pair<int, int> detectShiftCrossCorrelation(const TiFF& ref, const TiFF& def, int max_shift = 50) {
+    auto px_ref = averageProfileX(ref);
+    auto px_def = averageProfileX(def);
+    int shift_x = findBestShift(px_ref, px_def, max_shift);
+
+    auto py_ref = averageProfileY(ref);
+    auto py_def = averageProfileY(def);
+    int shift_y = findBestShift(py_ref, py_def, max_shift);
+
+    return {shift_x, shift_y};
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <fftw3.h>
+#include <utility>
+#include <stdexcept>
+
+std::pair<int, int> detectShiftFFT(const TiFF& ref, const TiFF& def) {
+    uint32_t w = ref.getWidth();
+    uint32_t h = ref.getHeight();
+
+    if (w != def.getWidth() || h != def.getHeight()) {
+        throw std::runtime_error("Les dimensions des images doivent être identiques.");
+    }
+
+    int n = w * h;
+    float* A = fftwf_alloc_real(n);
+    float* B = fftwf_alloc_real(n);
+
+    // Copier les pixels
+    for (uint32_t y = 0; y < h; ++y)
+        for (uint32_t x = 0; x < w; ++x) {
+            A[y * w + x] = ref.getPixel(x, y);
+            B[y * w + x] = def.getPixel(x, y);
+        }
+
+    fftwf_complex* FA = fftwf_alloc_complex(h * (w / 2 + 1));
+    fftwf_complex* FB = fftwf_alloc_complex(h * (w / 2 + 1));
+    fftwf_complex* FC = fftwf_alloc_complex(h * (w / 2 + 1));
+
+    fftwf_plan pa = fftwf_plan_dft_r2c_2d(h, w, A, FA, FFTW_ESTIMATE);
+    fftwf_plan pb = fftwf_plan_dft_r2c_2d(h, w, B, FB, FFTW_ESTIMATE);
+    fftwf_plan pc = fftwf_plan_dft_c2r_2d(h, w, FC, A, FFTW_ESTIMATE); // résultat dans A
+
+    fftwf_execute(pa);
+    fftwf_execute(pb);
+
+    for (int i = 0; i < h * (w / 2 + 1); ++i) {
+        float a_re = FA[i][0], a_im = FA[i][1];
+        float b_re = FB[i][0], b_im = -FB[i][1]; // conjugué
+
+        float re = a_re * b_re - a_im * b_im;
+        float im = a_re * b_im + a_im * b_re;
+        float mag = std::sqrt(re * re + im * im) + 1e-9f;
+
+        FC[i][0] = re / mag;
+        FC[i][1] = im / mag;
+    }
+
+    fftwf_execute(pc); // résultat dans A (réutilisé)
+
+    // Trouver le pic
+    int peak_x = 0, peak_y = 0;
+    float max_val = -1e9;
+    for (uint32_t y = 0; y < h; ++y) {
+        for (uint32_t x = 0; x < w; ++x) {
+            float val = A[y * w + x];
+            if (val > max_val) {
+                max_val = val;
+                peak_x = x;
+                peak_y = y;
+            }
+        }
+    }
+
+    // Corriger wrap-around
+    int dx = (peak_x > w / 2) ? peak_x - w : peak_x;
+    int dy = (peak_y > h / 2) ? peak_y - h : peak_y;
+
+    // Cleanup
+    fftwf_destroy_plan(pa);
+    fftwf_destroy_plan(pb);
+    fftwf_destroy_plan(pc);
+    fftwf_free(A);
+    fftwf_free(B);
+    fftwf_free(FA);
+    fftwf_free(FB);
+    fftwf_free(FC);
+
+    return {dx, dy};
+}
+
+
+TiFF ref, def;
+ref.load("image_ref.tif");
+def.load("image_defaut.tif");
+
+// Version simple :
+auto [dx_cc, dy_cc] = detectShiftCrossCorrelation(ref, def);
+std::cout << "[CrossCorrelation] dx = " << dx_cc << ", dy = " << dy_cc << "\n";
+
+// Version FFT :
+auto [dx_fft, dy_fft] = detectShiftFFT(ref, def);
+std::cout << "[FFT] dx = " << dx_fft << ", dy = " << dy_fft << "\n";
+
+// Appliquer le décalage
+shiftImageX(def, dx_fft);
+shiftImageY(def, dy_fft);
+def.save("realigned_fft.tif");
+
+
+
+
+void applyShift(int dx, int dy) {
+    std::vector<float> shifted(width * height, 0.0f);
+
+    for (uint32_t y = 0; y < height; ++y) {
+        int src_y = std::clamp<int>(int(y) - dy, 0, height - 1);
+
+        for (uint32_t x = 0; x < width; ++x) {
+            int src_x = std::clamp<int>(int(x) - dx, 0, width - 1);
+            shifted[y * width + x] = getPixel(src_x, src_y);
+        }
+    }
+
+    data = std::move(shifted);
+}
+
+🧪 Exemple dans main() avec FFT shift :
+cpp
+Copier
+Modifier
+TiFF ref, def;
+ref.load("image_ref.tif");
+def.load("image_defaut.tif");
+
+auto [dx, dy] = detectShiftFFT(ref, def);
+std::cout << "Décalage FFT détecté : dx = " << dx << ", dy = " << dy << "\n";
+
+def.applyShift(dx, dy);
+def.save("realigned.tif");

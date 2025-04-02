@@ -69,10 +69,38 @@ include CMakeFiles/main.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/main.dir/flags.make
 
+CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.o: /home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp
+CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/evan/Bureau/32-bits-float-grayscale-tiff/bin/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.o -MF CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.o.d -o CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.o -c /home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp
+
+CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp > CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.i
+
+CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp -o CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.s
+
+CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.o: /home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp
+CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/evan/Bureau/32-bits-float-grayscale-tiff/bin/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.o -MF CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.o.d -o CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.o -c /home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp
+
+CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp > CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.i
+
+CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp -o CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.s
+
 CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o: /home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp
 CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/evan/Bureau/32-bits-float-grayscale-tiff/bin/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/evan/Bureau/32-bits-float-grayscale-tiff/bin/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o -MF CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o.d -o CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o -c /home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp
 
 CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.i: cmake_force
@@ -85,15 +113,19 @@ CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.s
 
 # Object files for target main
 main_OBJECTS = \
+"CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.o" \
+"CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.o" \
 "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o"
 
 # External object files for target main
 main_EXTERNAL_OBJECTS =
 
+main: CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.o
+main: CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.o
 main: CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o
 main: CMakeFiles/main.dir/build.make
 main: CMakeFiles/main.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/evan/Bureau/32-bits-float-grayscale-tiff/bin/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/evan/Bureau/32-bits-float-grayscale-tiff/bin/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

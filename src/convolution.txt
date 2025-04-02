@@ -1,0 +1,182 @@
+Dans classe TIFF: 
+
+void convolve(const std::vector<std::vector<float>>& kernel) {
+    if (kernel.empty() || kernel[0].empty()) return;
+
+    int kw = kernel[0].size();
+    int kh = kernel.size();
+    int kcx = kw / 2;
+    int kcy = kh / 2;
+
+    std::vector<float> result(width * height, 0.0f);
+
+    for (uint32_t y = 0; y < height; ++y) {
+        for (uint32_t x = 0; x < width; ++x) {
+            float acc = 0.0f;
+
+            for (int ky = 0; ky < kh; ++ky) {
+                int iy = std::clamp<int>(y + ky - kcy, 0, height - 1);
+
+                for (int kx = 0; kx < kw; ++kx) {
+                    int ix = std::clamp<int>(x + kx - kcx, 0, width - 1);
+
+                    float val = getPixel(ix, iy);
+                    acc += val * kernel[ky][kx];
+                }
+            }
+
+            result[y * width + x] = acc;
+        }
+    }
+
+    data = std::move(result);
+}
+
+int main() {
+    TiFF img;
+    if (!img.load("input.tif")) {
+        std::cerr << "Erreur chargement image.\n";
+        return 1;
+    }
+
+    // Kernel de flou moyenne 3x3
+    std::vector<std::vector<float>> kernel = {
+        {1.f/9, 1.f/9, 1.f/9},
+        {1.f/9, 1.f/9, 1.f/9},
+        {1.f/9, 1.f/9, 1.f/9}
+    };
+
+    img.convolve(kernel);
+
+    img.save("output_flou.tif");
+
+    return 0;
+}
+
+💨 Sobel horizontal (gradient X) :
+cpp
+Copier
+Modifier
+std::vector<std::vector<float>> sobelX = {
+    {-1, 0, 1},
+    {-2, 0, 2},
+    {-1, 0, 1}
+};
+🔎 Laplacien :
+cpp
+Copier
+Modifier
+std::vector<std::vector<float>> laplacian = {
+    {0,  1, 0},
+    {1, -4, 1},
+    {0,  1, 0}
+};
+
+
+//////////////////////////////////////////////////////////////////
+
+void medianFilter(int ksize = 3) {
+    if (ksize % 2 == 0 || ksize < 1) return; // Doit être impair
+
+    int k = ksize / 2;
+    std::vector<float> result(width * height, 0.0f);
+    std::vector<float> neighborhood;
+
+    for (uint32_t y = 0; y < height; ++y) {
+        for (uint32_t x = 0; x < width; ++x) {
+            neighborhood.clear();
+
+            for (int dy = -k; dy <= k; ++dy) {
+                int iy = std::clamp<int>(y + dy, 0, height - 1);
+                for (int dx = -k; dx <= k; ++dx) {
+                    int ix = std::clamp<int>(x + dx, 0, width - 1);
+                    neighborhood.push_back(getPixel(ix, iy));
+                }
+            }
+
+            std::nth_element(
+                neighborhood.begin(),
+                neighborhood.begin() + neighborhood.size() / 2,
+                neighborhood.end()
+            );
+
+            result[y * width + x] = neighborhood[neighborhood.size() / 2];
+        }
+    }
+
+    data = std::move(result);
+}
+
+int main() {
+    TiFF img;
+    if (!img.load("noisy_image.tif")) {
+        std::cerr << "Erreur chargement image.\n";
+        return 1;
+    }
+
+    img.medianFilter(3); // filtre médian 3x3
+
+    img.save("denoised.tif");
+    return 0;
+
+    ///////////////////////////////////////////////////////////////////
+}
+
+
+void erode(const std::vector<std::vector<int>>& se) {
+    int kh = se.size();
+    int kw = se[0].size();
+    int kcx = kw / 2;
+    int kcy = kh / 2;
+
+    std::vector<float> result(width * height, 0.0f);
+
+    for (uint32_t y = 0; y < height; ++y) {
+        for (uint32_t x = 0; x < width; ++x) {
+            float min_val = std::numeric_limits<float>::max();
+
+            for (int dy = 0; dy < kh; ++dy) {
+                int iy = std::clamp<int>(y + dy - kcy, 0, height - 1);
+                for (int dx = 0; dx < kw; ++dx) {
+                    if (se[dy][dx] == 0) continue; // ignore si non actif
+
+                    int ix = std::clamp<int>(x + dx - kcx, 0, width - 1);
+                    min_val = std::min(min_val, getPixel(ix, iy));
+                }
+            }
+
+            result[y * width + x] = min_val;
+        }
+    }
+
+    data = std::move(result);
+}
+
+void dilate(const std::vector<std::vector<int>>& se) {
+    int kh = se.size();
+    int kw = se[0].size();
+    int kcx = kw / 2;
+    int kcy = kh / 2;
+
+    std::vector<float> result(width * height, 0.0f);
+
+    for (uint32_t y = 0; y < height; ++y) {
+        for (uint32_t x = 0; x < width; ++x) {
+            float max_val = std::numeric_limits<float>::lowest();
+
+            for (int dy = 0; dy < kh; ++dy) {
+                int iy = std::clamp<int>(y + dy - kcy, 0, height - 1);
+                for (int dx = 0; dx < kw; ++dx) {
+                    if (se[dy][dx] == 0) continue;
+
+                    int ix = std::clamp<int>(x + dx - kcx, 0, width - 1);
+                    max_val = std::max(max_val, getPixel(ix, iy));
+                }
+            }
+
+            result[y * width + x] = max_val;
+        }
+    }
+
+    data = std::move(result);
+}
