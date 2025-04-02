@@ -32,7 +32,6 @@
 #include <string>
 #include <stdexcept>
 #include <stack>
-//#include <sys/sysinfo.h>
 #include <thread>
 #include <typeindex>
 #include <type_traits>
@@ -48,3 +47,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <streambuf>
+#include <string>
+
+#include <unistd.h>      // getcwd
+#include <limits.h>      // PATH_MAX
+#include <sys/stat.h>    // mkdir
+#include <sys/types.h>   // mode_t
+#include <dirent.h> 
+#include <cerrno>

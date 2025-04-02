@@ -10,6 +10,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp" "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.o" "gcc" "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.o.d"
   "/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp" "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.o" "gcc" "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.o.d"
+  "/home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp" "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o" "gcc" "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o.d"
+  "/home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp" "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.o" "gcc" "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.o.d"
   "/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp" "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o" "gcc" "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o.d"
   )
 

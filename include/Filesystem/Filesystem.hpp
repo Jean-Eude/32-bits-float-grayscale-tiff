@@ -5,13 +5,12 @@
 #include <HeadersBase.hpp>
 
 class Filesystem {
-    public :
-        Filesystem() = delete;
-        ~Filesystem() = default;
-
-        static std::string getFilesystem(const std::string& Filesystem);
-        static bool createFile(const std::string& Filesystem);
-        static bool createDirectory(const std::string& Filesystem);
-        static bool removeFile(const std::string& Filesystem);
-        static bool removeDirectory(const std::string& Filesystem);
+    public:
+        static std::string getFilesystem(const std::string& path);
+        static bool createFile(const std::string& path);
+        static bool createDirectory(const std::string& path);
+        static bool removeFile(const std::string& path);
+        static bool removeDirectory(const std::string& path);
+        static std::vector<std::string> listFiles(const std::string& path);
+        static std::string getExtension(const std::string& filename);
 };

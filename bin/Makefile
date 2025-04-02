@@ -177,6 +177,54 @@ home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.s
 .PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.s
 
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.o: home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.o
+
+# target to build an object file
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o
+
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.i: home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.i
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.i
+
+# target to preprocess a source file
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.i
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.i
+
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.s: home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.s
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.s
+
+# target to generate assembly for a file
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.s
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.s
+
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.o: home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.o
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.o
+
+# target to build an object file
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.o
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.o
+
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.i: home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.i
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.i
+
+# target to preprocess a source file
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.i
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.i
+
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.s: home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.s
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.s
+
+# target to generate assembly for a file
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.s
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.s
+
 home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.o: home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o
 .PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.o
 
@@ -216,6 +264,12 @@ help:
 	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.o"
 	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.i"
 	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.s"
+	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.o"
+	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.i"
+	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.s"
+	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.o"
+	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.i"
+	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.s"
 	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.o"
 	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.i"
 	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.s"

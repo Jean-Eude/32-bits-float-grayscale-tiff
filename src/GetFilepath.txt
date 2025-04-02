@@ -1,0 +1,6 @@
+
+int main() {
+    std::cout << Filesystem::getFilesystem("output_bandes.tif") << std::endl;
+
+    return 0;
+}

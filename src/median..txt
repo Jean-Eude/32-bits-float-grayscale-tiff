@@ -1,0 +1,41 @@
+#include <algorithm>
+#include <iostream>
+
+void TiFF::applyMedianFilter(uint32_t kernelSize) {
+    if (kernelSize % 2 == 0 || kernelSize < 3) {
+        std::cerr << "Erreur : kernelSize doit être impair et >= 3" << std::endl;
+        return;
+    }
+
+    int offset = static_cast<int>(kernelSize / 2);
+    std::vector<float> filtered(data); // copie de l'image d'origine
+
+    auto getClampedPixel = [&](int x, int y) -> float {
+        // Réplication des bords
+        x = std::clamp(x, 0, static_cast<int>(width) - 1);
+        y = std::clamp(y, 0, static_cast<int>(height) - 1);
+        return getPixel(x, y);
+    };
+
+    for (uint32_t y = 0; y < height; ++y) {
+        for (uint32_t x = 0; x < width; ++x) {
+            std::vector<float> neighborhood;
+
+            for (int dy = -offset; dy <= offset; ++dy) {
+                for (int dx = -offset; dx <= offset; ++dx) {
+                    int nx = static_cast<int>(x) + dx;
+                    int ny = static_cast<int>(y) + dy;
+                    neighborhood.push_back(getClampedPixel(nx, ny));
+                }
+            }
+
+            size_t medianIndex = neighborhood.size() / 2;
+            std::nth_element(neighborhood.begin(), neighborhood.begin() + medianIndex, neighborhood.end());
+            float median = neighborhood[medianIndex];
+
+            filtered[y * width + x] = median;
+        }
+    }
+
+    data = std::move(filtered); // mise à jour de l’image
+}
