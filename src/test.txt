@@ -1,0 +1,59 @@
+🔧 Étapes principales :
+Normaliser les deux images.
+
+Appliquer la corrélation croisée via une boucle sur les décalages possibles.
+
+Trouver le décalage (dx, dy) qui maximise la somme des produits (cross-correlation).
+
+#include <limits>
+#include <cmath>
+
+std::pair<int, int> TiFF::crossCorrelate(const TiFF& ref, int maxShiftX = 20, int maxShiftY = 20) const {
+    if (width != ref.width || height != ref.height) {
+        std::cerr << "Erreur : dimensions incompatibles pour la corrélation." << std::endl;
+        return {0, 0};
+    }
+
+    float bestCorr = -std::numeric_limits<float>::infinity();
+    int bestDx = 0, bestDy = 0;
+
+    for (int dy = -maxShiftY; dy <= maxShiftY; ++dy) {
+        for (int dx = -maxShiftX; dx <= maxShiftX; ++dx) {
+            float sum = 0.0f;
+            int count = 0;
+
+            for (uint32_t y = 0; y < height; ++y) {
+                int yr = y + dy;
+                if (yr < 0 || yr >= static_cast<int>(height)) continue;
+
+                for (uint32_t x = 0; x < width; ++x) {
+                    int xr = x + dx;
+                    if (xr < 0 || xr >= static_cast<int>(width)) continue;
+
+                    float val1 = this->getPixel(x, y);
+                    float val2 = ref.getPixel(xr, yr);
+                    sum += val1 * val2;
+                    count++;
+                }
+            }
+
+            if (count > 0 && sum > bestCorr) {
+                bestCorr = sum;
+                bestDx = dx;
+                bestDy = dy;
+            }
+        }
+    }
+
+    return {bestDx, bestDy};
+}
+
+TiFF image;          // ton image brute
+TiFF reference;      // image homogène attendue (scintil)
+
+image.normalize();
+reference.normalize();
+
+auto [dx, dy] = image.crossCorrelate(reference);
+
+std::cout << "Décalage optimal : dx = " << dx << ", dy = " << dy << std::endl;
