@@ -1549,7 +1549,6 @@ CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitement
 CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o
  /home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp
  /usr/include/stdc-predef.h
- /home/evan/Bureau/32-bits-float-grayscale-tiff/include/Traitements.hpp
  /home/evan/Bureau/32-bits-float-grayscale-tiff/include/TiFF.hpp
  /home/evan/Bureau/32-bits-float-grayscale-tiff/include/tiffio.h
  /usr/include/tiff.h
@@ -1934,6 +1933,4 @@ CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o
  /usr/include/dirent.h
  /usr/include/x86_64-linux-gnu/bits/dirent.h
  /usr/include/x86_64-linux-gnu/bits/dirent_ext.h
- /home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.hpp
- /home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.hpp
 

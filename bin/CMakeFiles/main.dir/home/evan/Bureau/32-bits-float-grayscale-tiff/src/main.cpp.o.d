@@ -1,7 +1,6 @@
 CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o: \
  /home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp \
  /usr/include/stdc-predef.h \
- /home/evan/Bureau/32-bits-float-grayscale-tiff/bin/../include/Traitements.hpp \
  /home/evan/Bureau/32-bits-float-grayscale-tiff/bin/../include/TiFF.hpp \
  /home/evan/Bureau/32-bits-float-grayscale-tiff/bin/../include/tiffio.h \
  /usr/include/tiff.h /usr/include/tiffconf.h \
@@ -301,6 +300,4 @@ CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o
  /usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_statx.h \
  /usr/include/dirent.h /usr/include/x86_64-linux-gnu/bits/dirent.h \
- /usr/include/x86_64-linux-gnu/bits/dirent_ext.h \
- /home/evan/Bureau/32-bits-float-grayscale-tiff/bin/../include/Filesystem/Filesystem.hpp \
- /home/evan/Bureau/32-bits-float-grayscale-tiff/bin/../include/Parser/Parser.hpp
+ /usr/include/x86_64-linux-gnu/bits/dirent_ext.h

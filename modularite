@@ -1,0 +1,79 @@
+racine/
+│
+├── RDX_cpp/
+│   ├── src/fichier/       # Ton code C++ avec Traitements::Conversion
+│   └── bin/TestConversion # Binaire exécuté
+│
+└── RDX_radio/
+    └── radio/
+        ├── Code/py_test/convert_to_tiff.sh
+        └── Env/bin/activate  # Environnement virtuel Python
+ça: std::string cmd = "./convert_to_tiff.sh ...";
+en ça :
+
+std::string scriptPath = Filesystem::getAbsoluteScriptPath("../../../RDX_radio/radio/Code/py_test/convert_to_tiff.sh");
+std::string cmd = "\"" + scriptPath + "\" \"" + inputPath + "\" \"" + tiffPath + "\"";
+
+std::string Filesystem::getAbsoluteScriptPath(const std::string& relativePathFromBin) {
+    char exePath[1024];
+    ssize_t len = ::readlink("/proc/self/exe", exePath, sizeof(exePath)-1);
+    if (len != -1) {
+        exePath[len] = '\0';
+        std::filesystem::path exeDir = std::filesystem::path(exePath).parent_path();
+        return (exeDir / relativePathFromBin).lexically_normal().string();
+    } else {
+        throw std::runtime_error("Impossible de trouver le chemin de l'exécutable");
+    }
+}
+
+
+#!/bin/bash
+
+# Obtenir le chemin absolu du script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+# Activer l'environnement Python
+source "$SCRIPT_DIR/../../Env/bin/activate"
+
+# Ton code ici...
+# Exemple : python convert.py "$1" "$2"
+
+deactivate
+
+
+
+
+
+
+
+
+
+////////////////////
+
+
+#!/bin/bash
+
+# 🔒 Sauvegarde le dossier où on était avant
+ORIGINAL_DIR="$(pwd)"
+
+# Résout le chemin réel du script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+# Si on n'est pas déjà dans le bon dossier, on s'y rend
+if [[ "$ORIGINAL_DIR" != "$SCRIPT_DIR" ]]; then
+    echo "🔁 Déplacement automatique dans $SCRIPT_DIR"
+    cd "$SCRIPT_DIR" || exit 1
+else
+    echo "✅ Déjà dans le bon dossier : $SCRIPT_DIR"
+fi
+
+### Ici tu fais tout ce que tu veux dans le bon dossier ###
+# Par exemple :
+# source ../Env/bin/activate
+# python convert.py "$1" "$2"
+# deactivate
+
+# 🔙 Revenir au dossier d’origine
+cd "$ORIGINAL_DIR"
+echo "↩️ Retour au dossier d'origine : $ORIGINAL_DIR"
+
