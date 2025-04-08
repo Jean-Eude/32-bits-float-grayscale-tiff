@@ -1,0 +1,198 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    FILE *source, *destination;
+    char buffer[1024];
+    size_t bytesRead;
+
+    // Ouvre le fichier source en mode binaire
+    source = fopen("source.bin", "rb");
+    if (source == NULL) {
+        perror("Erreur lors de l'ouverture du fichier source");
+        return 1;
+    }
+
+    // Ouvre le fichier de destination en mode binaire
+    destination = fopen("copie.bin", "wb");
+    if (destination == NULL) {
+        perror("Erreur lors de l'ouverture du fichier destination");
+        fclose(source);
+        return 1;
+    }
+
+    // Aller à la fin pour connaître la taille du fichier
+    fseek(source, 0, SEEK_END);
+    long fileSize = ftell(source);
+    rewind(source); // Retour au début
+
+    // Lire le fichier par blocs de 1024 octets
+    while ((bytesRead = fread(buffer, 1, sizeof(buffer), source)) > 0) {
+        fwrite(buffer, 1, bytesRead, destination);
+    }
+
+    printf("Fichier copié avec succès (%ld octets).\n", fileSize);
+
+    fclose(source);
+    fclose(destination);
+
+    return 0;
+}
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    FILE *source, *destination;
+    unsigned char byte;
+    long positions[] = {42, 102, 502};
+    int nb_positions = sizeof(positions) / sizeof(positions[0]);
+
+    // Ouvrir le fichier source en mode binaire
+    source = fopen("source.bin", "rb");
+    if (source == NULL) {
+        perror("Erreur lors de l'ouverture du fichier source");
+        return 1;
+    }
+
+    // Ouvrir le fichier destination pour écrire les octets extraits
+    destination = fopen("extrait.bin", "wb");
+    if (destination == NULL) {
+        perror("Erreur lors de l'ouverture du fichier destination");
+        fclose(source);
+        return 1;
+    }
+
+    for (int i = 0; i < nb_positions; i++) {
+        // Se déplacer à la position demandée
+        if (fseek(source, positions[i], SEEK_SET) != 0) {
+            perror("Erreur lors du déplacement dans le fichier");
+            continue;
+        }
+
+        // Lire un octet
+        if (fread(&byte, 1, 1, source) == 1) {
+            // Écrire l'octet dans le fichier de destination
+            fwrite(&byte, 1, 1, destination);
+        } else {
+            fprintf(stderr, "Impossible de lire l'octet à la position %ld\n", positions[i]);
+        }
+    }
+
+    printf("Octets extraits avec succès dans 'extrait.bin'.\n");
+
+    fclose(source);
+    fclose(destination);
+
+    return 0;
+}
+
+
+// Aller à 100 octets après le début
+file.seekg(100, std::ios::beg);
+
+// Avancer de 10 octets depuis la position actuelle
+file.seekg(10, std::ios::cur);
+
+// Reculer de 5 octets depuis la fin du fichier
+file.seekg(-5, std::ios::end);
+
+
+#include <iostream>
+#include <fstream>
+
+int main() {
+    std::ifstream source("source.bin", std::ios::binary);
+    if (!source) {
+        std::cerr << "Erreur lors de l'ouverture du fichier source." << std::endl;
+        return 1;
+    }
+
+    std::ofstream destination("extrait.bin", std::ios::binary);
+    if (!destination) {
+        std::cerr << "Erreur lors de l'ouverture du fichier destination." << std::endl;
+        return 1;
+    }
+
+    // Lecture d’un short (2 octets) à la position 42
+    short s;
+    source.seekg(42, std::ios::beg);
+    source.read(reinterpret_cast<char*>(&s), sizeof(short));
+    if (source.gcount() != sizeof(short)) {
+        std::cerr << "Erreur de lecture du short à 42." << std::endl;
+    } else {
+        std::cout << "Short lu à 42 : " << s << std::endl;
+        destination.write(reinterpret_cast<char*>(&s), sizeof(short));
+    }
+
+    // Lecture d’un int (4 octets) à la position 102
+    int i;
+    source.seekg(102, std::ios::beg);
+    source.read(reinterpret_cast<char*>(&i), sizeof(int));
+    if (source.gcount() != sizeof(int)) {
+        std::cerr << "Erreur de lecture de l'int à 102." << std::endl;
+    } else {
+        std::cout << "Int lu à 102 : " << i << std::endl;
+        destination.write(reinterpret_cast<char*>(&i), sizeof(int));
+    }
+
+    // Lecture d’un float (4 octets) à la position 402
+    float f;
+    source.seekg(402, std::ios::beg);
+    source.read(reinterpret_cast<char*>(&f), sizeof(float));
+    if (source.gcount() != sizeof(float)) {
+        std::cerr << "Erreur de lecture du float à 402." << std::endl;
+    } else {
+        std::cout << "Float lu à 402 : " << f << std::endl;
+        destination.write(reinterpret_cast<char*>(&f), sizeof(float));
+    }
+
+    std::cout << "Valeurs extraites et écrites dans 'extrait.bin'." << std::endl;
+
+    return 0;
+}
+
+stream.seekp(offset, direction);
+offset : le décalage (positif ou négatif)
+
+direction : une des constantes suivantes :
+
+std::ios::beg → depuis le début du fichier
+std::ios::cur → depuis la position actuelle
+std::ios::end → depuis la fin du fichier
+
+
+#include <iostream>
+#include <fstream>
+
+int main() {
+    std::ofstream file("source.bin", std::ios::binary);
+
+    if (!file) {
+        std::cerr << "Erreur à l'ouverture du fichier." << std::endl;
+        return 1;
+    }
+
+    short s = 12345;
+    int i = 987654321;
+    float f = 3.14159f;
+
+    // Écrire le short à l'offset 42
+    file.seekp(42, std::ios::beg);
+    file.write(reinterpret_cast<char*>(&s), sizeof(short));
+
+    // Écrire l'int à l'offset 102
+    file.seekp(102, std::ios::beg);
+    file.write(reinterpret_cast<char*>(&i), sizeof(int));
+
+    // Écrire le float à l'offset 402
+    file.seekp(402, std::ios::beg);
+    file.write(reinterpret_cast<char*>(&f), sizeof(float));
+
+    file.close();
+    std::cout << "Données écrites dans source.bin aux bons offsets." << std::endl;
+
+    return 0;
+}
+
+
