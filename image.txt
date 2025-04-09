@@ -1,0 +1,326 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <cstring>
+
+class Image {
+public:
+    std::vector<void*> data;
+
+    virtual void read(const std::string& filename) = 0;
+    virtual void write(const std::string& filename) = 0;
+
+    virtual ~Image() = default;
+};
+
+class UY : public Image {
+private:
+    uint32_t width;
+    uint32_t height;
+    int codage; // 3 = float, 6 = long, 9 = int
+
+public:
+    UY(uint32_t w = 2, uint32_t h = 2, int code = 9)
+        : width(w), height(h), codage(code) {
+        std::cout << "Création image grayscale " << width << "x" << height
+                  << " (codage " << codage << ")\n";
+
+        size_t pixel_count = width * height;
+        data.resize(pixel_count);
+
+        for (uint32_t y = 0; y < height; ++y) {
+            for (uint32_t x = 0; x < width; ++x) {
+                size_t index = y * width + x;
+                if (codage == 3) {
+                    float* val = new float(static_cast<float>(index * 0.25f));
+                    data[index] = val;
+                } else if (codage == 6) {
+                    long* val = new long(index * 1000L);
+                    data[index] = val;
+                } else if (codage == 9) {
+                    int* val = new int(index * 10);
+                    data[index] = val;
+                }
+            }
+        }
+    }
+
+    void write(const std::string& filename) override {
+        std::ofstream file(filename, std::ios::binary);
+        if (!file) {
+            std::cerr << "Erreur écriture fichier.\n";
+            return;
+        }
+
+        file.seekp(0, std::ios::beg);
+        file.write(reinterpret_cast<char*>(&width), sizeof(width));
+        file.write(reinterpret_cast<char*>(&height), sizeof(height));
+        file.write(reinterpret_cast<char*>(&codage), sizeof(codage));
+
+        for (void* ptr : data) {
+            if (codage == 3) {
+                file.write(reinterpret_cast<char*>(ptr), sizeof(float));
+            } else if (codage == 6) {
+                file.write(reinterpret_cast<char*>(ptr), sizeof(long));
+            } else if (codage == 9) {
+                file.write(reinterpret_cast<char*>(ptr), sizeof(int));
+            }
+        }
+
+        file.close();
+    }
+
+    void read(const std::string& filename) override {
+        std::ifstream file(filename, std::ios::binary);
+        if (!file) {
+            std::cerr << "Erreur lecture fichier.\n";
+            return;
+        }
+
+        file.seekg(0, std::ios::beg);
+        file.read(reinterpret_cast<char*>(&width), sizeof(width));
+        file.read(reinterpret_cast<char*>(&height), sizeof(height));
+        file.read(reinterpret_cast<char*>(&codage), sizeof(codage));
+
+        size_t pixel_count = width * height;
+        data.resize(pixel_count);
+
+        for (size_t i = 0; i < pixel_count; ++i) {
+            if (codage == 3) {
+                float* val = new float;
+                file.read(reinterpret_cast<char*>(val), sizeof(float));
+                data[i] = val;
+            } else if (codage == 6) {
+                long* val = new long;
+                file.read(reinterpret_cast<char*>(val), sizeof(long));
+                data[i] = val;
+            } else if (codage == 9) {
+                int* val = new int;
+                file.read(reinterpret_cast<char*>(val), sizeof(int));
+                data[i] = val;
+            }
+        }
+
+        file.close();
+    }
+
+    void print() const {
+        std::cout << "Contenu de l'image (" << width << "x" << height << ") :\n";
+        for (size_t i = 0; i < data.size(); ++i) {
+            if (codage == 3) {
+                std::cout << *static_cast<float*>(data[i]) << " ";
+            } else if (codage == 6) {
+                std::cout << *static_cast<long*>(data[i]) << " ";
+            } else if (codage == 9) {
+                std::cout << *static_cast<int*>(data[i]) << " ";
+            }
+
+            if ((i + 1) % width == 0)
+                std::cout << "\n";
+        }
+    }
+
+    ~UY() {
+        for (void* ptr : data) {
+            if (codage == 3) delete static_cast<float*>(ptr);
+            else if (codage == 6) delete static_cast<long*>(ptr);
+            else if (codage == 9) delete static_cast<int*>(ptr);
+        }
+    }
+};
+
+class XZ : public Image {
+    private:
+        uint32_t width;
+        uint32_t height;
+        double scale;
+        int depth;
+    
+    public:
+        XZ(uint32_t w, uint32_t h, double s, int d, bool initZero) : width(w), height(h), scale(s), depth(d) {
+            data.resize(width * height);
+            if (initZero) {
+                for (uint32_t y = 0; y < height; ++y) {
+                    for (uint32_t x = 0; x < width; ++x) {
+                        size_t index = y * width + x;
+                        data[index] = new float(0.0f);
+                    }
+                }
+            }
+        }
+        
+        void read(const std::string& filename) override {
+            std::ifstream file(filename, std::ios::binary);
+            if (!file) {
+                std::cerr << "Erreur lecture XZ\n";
+                return;
+            }
+    
+            file.read(reinterpret_cast<char*>(&width), sizeof(width));
+            file.read(reinterpret_cast<char*>(&height), sizeof(height));
+            file.read(reinterpret_cast<char*>(&scale), sizeof(scale));
+            file.read(reinterpret_cast<char*>(&depth), sizeof(depth));
+    
+            size_t count = width * height;
+            data.resize(count);
+    
+            for (size_t i = 0; i < count; ++i) {
+                float* val = new float;
+                file.read(reinterpret_cast<char*>(val), sizeof(float));
+                data[i] = val;
+            }
+    
+            file.close();
+        }
+    
+        ~XZ() {
+            for (void* ptr : data) {
+                delete static_cast<float*>(ptr);
+            }
+        }
+    
+        void print() const {
+            std::cout << "Image XZ (" << width << "x" << height << ") scale=" << scale << ", depth=" << depth << "\n";
+            for (size_t i = 0; i < data.size(); ++i) {
+                std::cout << *static_cast<float*>(data[i]) << " ";
+                if ((i + 1) % width == 0)
+                    std::cout << "\n";
+            }
+        }
+    };
+
+    class Conversion {
+        public:
+            void UY2XZ(const char* inputFile, const char* outputFile) {
+                // Lire UY
+                UY uy;
+                uy.read(inputFile);
+            
+                uint32_t w = uy.getWidth();
+                uint32_t h = uy.getHeight();
+                int codage = uy.getCodage();
+            
+                // Déduire métadonnées pour l'entête XZ
+                double scale = 1.0;
+                int depth = 32;
+            
+                if (codage == 3) {
+                    scale = 1.0;
+                    depth = 32;
+                } else if (codage == 6) {
+                    scale = 1000.0;
+                    depth = 64;
+                } else if (codage == 9) {
+                    scale = 10.0;
+                    depth = 24;
+                }
+            
+                // Ouvrir fichier sortie
+                std::ofstream file(outputFile, std::ios::binary);
+                if (!file) {
+                    std::cerr << "Erreur ouverture fichier pour écriture (direct XZ).\n";
+                    return;
+                }
+            
+                // --- ÉCRITURE DE L'ENTÊTE ---
+                file.seekp(0, std::ios::beg);
+                file.write(reinterpret_cast<char*>(&w), sizeof(w));         // Offset 0
+                file.write(reinterpret_cast<char*>(&h), sizeof(h));         // Offset 4
+                file.write(reinterpret_cast<char*>(&scale), sizeof(scale)); // Offset 8
+                file.write(reinterpret_cast<char*>(&depth), sizeof(depth)); // Offset 16
+            
+                // --- DONNÉES ---
+                std::streamoff offsetData = sizeof(w) + sizeof(h) + sizeof(scale) + sizeof(depth);
+                file.seekp(offsetData, std::ios::beg);
+            
+                for (uint32_t y = 0; y < h; ++y) {
+                    for (uint32_t x = 0; x < w; ++x) {
+                        size_t index = y * w + x;
+                        float value = 0.0f;
+            
+                        if (codage == 3) {
+                            value = *static_cast<float*>(uy.data[index]);
+                        } else if (codage == 6) {
+                            value = static_cast<float>(*static_cast<long*>(uy.data[index]));
+                        } else if (codage == 9) {
+                            value = static_cast<float>(*static_cast<int*>(uy.data[index]));
+                        }
+            
+                        file.write(reinterpret_cast<char*>(&value), sizeof(float));
+                    }
+                }
+            
+                file.close();
+            
+                std::cout << "Conversion UY -> XZ écrite directement dans '" << outputFile << "'\n";
+            }
+        };
+    
+
+int main() {
+    UY imgOut(2, 2, 3); // Grayscale float
+    imgOut.write("image_gray.bin");
+
+    UY imgIn;
+    imgIn.read("image_gray.bin");
+    imgIn.print();
+
+    return 0;
+}
+
+#include <tiffio.h>
+
+// Sauvegarde d'une image UY en TIFF float 64 bits (double), quel que soit le codage
+void saveUYAsTIFF(const UY& uy, const std::string& filename) {
+    TIFF* tiff = TIFFOpen(filename.c_str(), "w");
+    if (!tiff) {
+        std::cerr << "Erreur ouverture TIFF\n";
+        return;
+    }
+
+    uint32_t width = uy.getWidth();
+    uint32_t height = uy.getHeight();
+    int codage = uy.getCodage();
+
+    // Forcer le format TIFF à 64 bits float
+    int bitsPerSample = 64;
+    int sampleFormat = SAMPLEFORMAT_IEEEFP;
+
+    // Configuration des champs TIFF
+    TIFFSetField(tiff, TIFFTAG_IMAGEWIDTH, width);
+    TIFFSetField(tiff, TIFFTAG_IMAGELENGTH, height);
+    TIFFSetField(tiff, TIFFTAG_BITSPERSAMPLE, bitsPerSample);
+    TIFFSetField(tiff, TIFFTAG_SAMPLEFORMAT, sampleFormat);
+    TIFFSetField(tiff, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
+    TIFFSetField(tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
+    TIFFSetField(tiff, TIFFTAG_SAMPLESPERPIXEL, 1);
+    TIFFSetField(tiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+    TIFFSetField(tiff, TIFFTAG_ROWSPERSTRIP, 1);
+
+    // Allocation d’un buffer temporaire pour une ligne
+    double* buffer = (double*)_TIFFmalloc(width * sizeof(double));
+
+    for (uint32_t y = 0; y < height; ++y) {
+        for (uint32_t x = 0; x < width; ++x) {
+            size_t i = y * width + x;
+
+            // Conversion quel que soit le codage
+            if (codage == 3) {
+                buffer[x] = static_cast<double>(*static_cast<float*>(uy.data[i]));
+            } else if (codage == 6) {
+                buffer[x] = static_cast<double>(*static_cast<long*>(uy.data[i]));
+            } else if (codage == 9) {
+                buffer[x] = static_cast<double>(*static_cast<int*>(uy.data[i]));
+            } else {
+                buffer[x] = 0.0; // Valeur par défaut si codage inconnu
+            }
+        }
+
+        TIFFWriteScanline(tiff, buffer, y, 0);
+    }
+
+    _TIFFfree(buffer);
+    TIFFClose(tiff);
+
+    std::cout << "Image UY enregistrée en TIFF 64-bit float : " << filename << "\n";
+}
