@@ -1,0 +1,154 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <cstring>
+
+class SPEImage {
+private:
+    uint16_t width = 0;
+    uint16_t height = 0;
+    int16_t datatype = 3; // default: 3 = uint16
+    std::vector<void*> data;
+
+    static constexpr std::streamoff HEADER_SIZE = 4100;
+
+public:
+    SPEImage() = default;
+
+    SPEImage(uint16_t w, uint16_t h, int16_t dtype)
+        : width(w), height(h), datatype(dtype) {
+        size_t count = width * height;
+        data.resize(count);
+
+        for (size_t i = 0; i < count; ++i) {
+            if (datatype == 0) data[i] = new float(i * 1.1f);
+            else if (datatype == 3) data[i] = new uint16_t(i * 2);
+            else if (datatype == 1) data[i] = new int32_t(i);
+        }
+    }
+
+    ~SPEImage() {
+        for (void* ptr : data) {
+            if (datatype == 0) delete static_cast<float*>(ptr);
+            else if (datatype == 3) delete static_cast<uint16_t*>(ptr);
+            else if (datatype == 1) delete static_cast<int32_t*>(ptr);
+        }
+    }
+
+    void write(const std::string& filename) {
+        std::ofstream out(filename, std::ios::binary);
+        if (!out) {
+            std::cerr << "Erreur ouverture en écriture.\n";
+            return;
+        }
+
+        // Écrire un header vide
+        std::vector<char> header(HEADER_SIZE, 0);
+
+        // XDim (offset 42)
+        out.seekp(42, std::ios::beg);
+        out.write(reinterpret_cast<char*>(&width), sizeof(width));
+
+        // YDim (offset 656)
+        out.seekp(656, std::ios::beg);
+        out.write(reinterpret_cast<char*>(&height), sizeof(height));
+
+        // Data type (offset 108)
+        out.seekp(108, std::ios::beg);
+        out.write(reinterpret_cast<char*>(&datatype), sizeof(datatype));
+
+        // Aller à la fin de l’en-tête pour écrire les données
+        out.seekp(HEADER_SIZE, std::ios::beg);
+
+        for (void* ptr : data) {
+            if (datatype == 0) out.write(reinterpret_cast<char*>(ptr), sizeof(float));
+            else if (datatype == 3) out.write(reinterpret_cast<char*>(ptr), sizeof(uint16_t));
+            else if (datatype == 1) out.write(reinterpret_cast<char*>(ptr), sizeof(int32_t));
+        }
+
+        out.close();
+        std::cout << "Image SPE écrite : " << filename << "\n";
+    }
+
+    void read(const std::string& filename) {
+        std::ifstream in(filename, std::ios::binary);
+        if (!in) {
+            std::cerr << "Erreur ouverture fichier SPE.\n";
+            return;
+        }
+
+        // Lire width à offset 42
+        in.seekg(42, std::ios::beg);
+        in.read(reinterpret_cast<char*>(&width), sizeof(width));
+
+        // Lire height à offset 656
+        in.seekg(656, std::ios::beg);
+        in.read(reinterpret_cast<char*>(&height), sizeof(height));
+
+        // Lire datatype à offset 108
+        in.seekg(108, std::ios::beg);
+        in.read(reinterpret_cast<char*>(&datatype), sizeof(datatype));
+
+        size_t count = width * height;
+        data.resize(count);
+
+        // Lire les données après le header
+        in.seekg(HEADER_SIZE, std::ios::beg);
+        for (size_t i = 0; i < count; ++i) {
+            if (datatype == 0) {
+                float* val = new float;
+                in.read(reinterpret_cast<char*>(val), sizeof(float));
+                data[i] = val;
+            } else if (datatype == 3) {
+                uint16_t* val = new uint16_t;
+                in.read(reinterpret_cast<char*>(val), sizeof(uint16_t));
+                data[i] = val;
+            } else if (datatype == 1) {
+                int32_t* val = new int32_t;
+                in.read(reinterpret_cast<char*>(val), sizeof(int32_t));
+                data[i] = val;
+            }
+        }
+
+        in.close();
+        std::cout << "Image SPE lue : " << filename << " (" << width << "x" << height << ", type=" << datatype << ")\n";
+    }
+
+    void print() const {
+        std::cout << "Contenu SPE (" << width << "x" << height << ", type=" << datatype << "):\n";
+        for (size_t i = 0; i < data.size(); ++i) {
+            if (datatype == 0) std::cout << *static_cast<float*>(data[i]) << " ";
+            else if (datatype == 3) std::cout << *static_cast<uint16_t*>(data[i]) << " ";
+            else if (datatype == 1) std::cout << *static_cast<int32_t*>(data[i]) << " ";
+            if ((i + 1) % width == 0) std::cout << "\n";
+        }
+    }
+};
+
+#include <variant>
+#include <cstdint>
+
+using SPEValue = std::variant<
+    float,      // 0
+    int32_t,    // 1
+    int16_t,    // 2
+    uint16_t,   // 3
+    uint32_t,   // 4
+    double,     // 5
+    uint8_t,    // 6
+    int8_t      // 8
+>;
+
+SPEValue defaultValueForSPECode(int code) {
+    switch (code) {
+        case 0: return float(0.0f);
+        case 1: return int32_t(0);
+        case 2: return int16_t(0);
+        case 3: return uint16_t(0);
+        case 4: return uint32_t(0);
+        case 5: return double(0.0);
+        case 6: return uint8_t(0);
+        case 8: return int8_t(0);
+        default: throw std::runtime_error("Type inconnu");
+    }
+}
