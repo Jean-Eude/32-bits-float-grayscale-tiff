@@ -1,0 +1,60 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <cstring> // pour memset, strncpy
+
+struct Image {
+    char entete[80];
+    long width;
+    long height;
+    char historique[80];
+    std::vector<unsigned char> data;
+
+    // Lecture depuis un fichier
+    bool lireDepuisFichier(const std::string& nomFichier) {
+        std::ifstream fichier(nomFichier, std::ios::binary);
+        if (!fichier) {
+            std::cerr << "Erreur d'ouverture du fichier en lecture\n";
+            return false;
+        }
+
+        fichier.read(entete, sizeof(entete));
+        fichier.read(reinterpret_cast<char*>(&width), sizeof(long));
+        fichier.read(reinterpret_cast<char*>(&height), sizeof(long));
+        fichier.read(historique, sizeof(historique));
+
+        size_t taille = static_cast<size_t>(width) * static_cast<size_t>(height);
+        data.resize(taille);
+        fichier.read(reinterpret_cast<char*>(data.data()), taille);
+
+        return fichier.good();
+    }
+
+    // Écriture dans un fichier, avec chaînes sécurisées passées en argument
+    bool ecrireDansFichier(const std::string& nomFichier, const std::string& texteEntete, const std::string& texteHistorique) {
+        std::ofstream fichier(nomFichier, std::ios::binary);
+        if (!fichier) {
+            std::cerr << "Erreur d'ouverture du fichier en écriture\n";
+            return false;
+        }
+
+        // Initialisation sécurisée de entete
+        std::memset(entete, 0, sizeof(entete));
+        std::strncpy(entete, texteEntete.c_str(), sizeof(entete) - 1);
+        fichier.write(entete, sizeof(entete));
+
+        // Écriture de width et height
+        fichier.write(reinterpret_cast<const char*>(&width), sizeof(long));
+        fichier.write(reinterpret_cast<const char*>(&height), sizeof(long));
+
+        // Initialisation sécurisée de historique
+        std::memset(historique, 0, sizeof(historique));
+        std::strncpy(historique, texteHistorique.c_str(), sizeof(historique) - 1);
+        fichier.write(historique, sizeof(historique));
+
+        // Écriture des données
+        fichier.write(reinterpret_cast<const char*>(data.data()), data.size());
+
+        return fichier.good();
+    }
+};
