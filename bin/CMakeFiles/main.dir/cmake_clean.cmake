@@ -1,12 +1,4 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.o"
-  "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Filesystem/Filesystem.cpp.o.d"
-  "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.o"
-  "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/include/Parser/Parser.cpp.o.d"
-  "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o"
-  "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o.d"
-  "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.o"
-  "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/Traitements.cpp.o.d"
   "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o"
   "CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o.d"
   "main"
