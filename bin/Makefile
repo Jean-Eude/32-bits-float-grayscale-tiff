@@ -129,6 +129,30 @@ main/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.o: home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.o
+
+# target to build an object file
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o
+
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.i: home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.i
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.i
+
+# target to preprocess a source file
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.i
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.i
+
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.s: home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.s
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.s
+
+# target to generate assembly for a file
+home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.s
+.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.s
+
 home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.o: home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o
 .PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.o
 
@@ -162,6 +186,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... main"
+	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.o"
+	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.i"
+	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.s"
 	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.o"
 	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.i"
 	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.s"
