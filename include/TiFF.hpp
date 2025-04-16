@@ -7,6 +7,8 @@
 class TiFF {
 public:
 	TiFF();
+	TiFF(const TiFF& other) = default;
+	TiFF& operator=(const TiFF& other) = default;
 
 	bool load(const std::string& filename);
 	bool save(const std::string& filename) const;

@@ -1,114 +1,90 @@
-#include "TiFF.hpp"
-#include <iostream>
-#include <vector>
-#include <cmath>
-#include <random>
+#include <stdio.h>
+#include <stdint.h>
 
-// Soft thresholding function
-double softThreshold(double value, double threshold) {
-    if (std::abs(value) <= threshold) return 0.0;
-    return (value > 0) ? value - threshold : value + threshold;
-}
-
-// Simple 1-level Haar DWT on 2D image
-void haarDWT(std::vector<double>& data, uint32_t width, uint32_t height) {
-    std::vector<double> temp(data.size());
-
-    // Horizontal pass
-    for (uint32_t y = 0; y < height; ++y) {
-        for (uint32_t x = 0; x < width / 2; ++x) {
-            double a = data[y * width + 2 * x];
-            double b = data[y * width + 2 * x + 1];
-            temp[y * width + x] = (a + b) / std::sqrt(2.0);           // Approx
-            temp[y * width + x + width / 2] = (a - b) / std::sqrt(2.0); // Detail
-        }
-    }
-
-    // Vertical pass
-    for (uint32_t x = 0; x < width; ++x) {
-        for (uint32_t y = 0; y < height / 2; ++y) {
-            double a = temp[(2 * y) * width + x];
-            double b = temp[(2 * y + 1) * width + x];
-            data[y * width + x] = (a + b) / std::sqrt(2.0);
-            data[(y + height / 2) * width + x] = (a - b) / std::sqrt(2.0);
-        }
-    }
-}
-
-// Inverse DWT
-void haarIDWT(std::vector<double>& data, uint32_t width, uint32_t height) {
-    std::vector<double> temp(data.size());
-
-    // Vertical
-    for (uint32_t x = 0; x < width; ++x) {
-        for (uint32_t y = 0; y < height / 2; ++y) {
-            double a = data[y * width + x];
-            double d = data[(y + height / 2) * width + x];
-            temp[2 * y * width + x] = (a + d) / std::sqrt(2.0);
-            temp[(2 * y + 1) * width + x] = (a - d) / std::sqrt(2.0);
-        }
-    }
-
-    // Horizontal
-    for (uint32_t y = 0; y < height; ++y) {
-        for (uint32_t x = 0; x < width / 2; ++x) {
-            double a = temp[y * width + x];
-            double d = temp[y * width + x + width / 2];
-            data[y * width + 2 * x] = (a + d) / std::sqrt(2.0);
-            data[y * width + 2 * x + 1] = (a - d) / std::sqrt(2.0);
-        }
-    }
-}
-
-// Denoise detail coefficients with soft threshold
-void thresholdWavelet(std::vector<double>& data, uint32_t width, uint32_t height, double threshold) {
-    for (uint32_t y = 0; y < height; ++y) {
-        for (uint32_t x = 0; x < width; ++x) {
-            // Skip top-left (LL band, approx)
-            if (x < width / 2 && y < height / 2) continue;
-            data[y * width + x] = softThreshold(data[y * width + x], threshold);
-        }
-    }
-}
-
-// Simulate white noise
-void addWhiteNoise(std::vector<double>& data, double stddev) {
-    std::default_random_engine rng(42);
-    std::normal_distribution<double> dist(0.0, stddev);
-    for (auto& px : data) px += dist(rng);
+uint32_t swap_endian(uint32_t val) {
+    return ((val >> 24) & 0x000000FF) |
+           ((val >> 8)  & 0x0000FF00) |
+           ((val << 8)  & 0x00FF0000) |
+           ((val << 24) & 0xFF000000);
 }
 
 int main() {
-    TiFF image;
-    const uint32_t W = 128, H = 128;
-
-    // Step 1: Create clean image (radial gradient)
-    image.create(W, H, 0.0);
-    for (uint32_t y = 0; y < H; ++y) {
-        for (uint32_t x = 0; x < W; ++x) {
-            double dx = x - W / 2;
-            double dy = y - H / 2;
-            double r = std::sqrt(dx * dx + dy * dy) / (W / 2);
-            image.setPixel(x, y, std::exp(-r * r));
-        }
+    FILE *file = fopen("mon_fichier.bin", "rb");
+    if (!file) {
+        perror("Erreur lors de l'ouverture du fichier");
+        return 1;
     }
 
-    // Step 2: Add white noise
-    auto noisy = image; // Copy
-addWhiteNoise(noisy.getData(), 0.1);
+    uint32_t magic;
+    if (fread(&magic, sizeof(uint32_t), 1, file) != 1) {
+        perror("Erreur lors de la lecture du magic number");
+        fclose(file);
+        return 1;
+    }
 
-    noisy.normalize();
-    noisy.save("noisy_wavelet.tif");
+    // Pour le debug : affichage brut
+    printf("Magic brut : 0x%08X\n", magic);
 
-    // Step 3: Wavelet Denoising
-    auto denoised = noisy;
-haarDWT(denoised.getData(), W, H);
-thresholdWavelet(denoised.getData(), W, H, 0.05);
-haarIDWT(denoised.getData(), W, H);
-    denoised.normalize();
-    denoised.save("denoised_wavelet.tif");
+    if (magic == 123) {
+        printf("Fichier en little endian\n");
+    } else if (swap_endian(magic) == 123) {
+        printf("Fichier en big endian\n");
+        magic = swap_endian(magic);  // On convertit pour l'utiliser ensuite
+    } else {
+        printf("Magic number inattendu : 0x%08X\n", magic);
+        fclose(file);
+        return 1;
+    }
 
-    std::cout << "Done! Saved noisy and denoised images." << std::endl;
+    printf("Magic validé : %u\n", magic);
+
+    fclose(file);
     return 0;
 }
 
+#include <iostream>
+#include <fstream>
+#include <cstdint>
+
+// Fonction pour swapper un uint32_t (big <-> little)
+uint32_t swapEndian(uint32_t val) {
+    return ((val >> 24) & 0x000000FF) |
+           ((val >> 8)  & 0x0000FF00) |
+           ((val << 8)  & 0x00FF0000) |
+           ((val << 24) & 0xFF000000);
+}
+
+int main() {
+    std::ifstream file("mon_fichier.bin", std::ios::binary);
+    if (!file) {
+        std::cerr << "Erreur : impossible d'ouvrir le fichier." << std::endl;
+        return 1;
+    }
+
+    uint32_t magic;
+    file.read(reinterpret_cast<char*>(&magic), sizeof(magic));
+    if (!file) {
+        std::cerr << "Erreur lors de la lecture du magic number." << std::endl;
+        return 1;
+    }
+
+    std::cout << "Magic lu (brut) : 0x" << std::hex << magic << std::dec << std::endl;
+
+    // Vérifie et convertit si besoin
+    if (magic == 123) {
+        std::cout << "Fichier en little endian." << std::endl;
+    } else if (swapEndian(magic) == 123) {
+        std::cout << "Fichier en big endian. Conversion vers little endian..." << std::endl;
+        magic = swapEndian(magic);
+    } else {
+        std::cerr << "Magic number inattendu : " << magic << std::endl;
+        return 1;
+    }
+
+    std::cout << "Magic confirmé : " << magic << std::endl;
+
+    // Tu peux continuer à lire d'autres champs ici...
+    
+    file.close();
+    return 0;
+}

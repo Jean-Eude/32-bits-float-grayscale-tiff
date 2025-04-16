@@ -1,0 +1,129 @@
+#include <iostream>
+#include <vector>
+#include <cstring>
+#include <cstdint>
+#include <iomanip>
+#include <type_traits>
+
+template <typename T>
+void writeLE(std::vector<unsigned char>& buffer, T value) {
+    for (size_t i = 0; i < sizeof(T); ++i)
+        buffer.push_back(reinterpret_cast<unsigned char*>(&value)[i]);
+}
+
+template <typename T>
+void writeBE(std::vector<unsigned char>& buffer, T value) {
+    for (int i = sizeof(T) - 1; i >= 0; --i)
+        buffer.push_back(reinterpret_cast<unsigned char*>(&value)[i]);
+}
+
+void writeCharArray(std::vector<unsigned char>& buffer, const char* str, size_t size) {
+    for (size_t i = 0; i < size; ++i)
+        buffer.push_back(i < std::strlen(str) ? str[i] : 0);
+}
+
+void printBytes(const unsigned char* data, size_t size) {
+    std::cout << "Octets bruts : ";
+    for (size_t i = 0; i < size; ++i)
+        std::cout << std::hex << std::setw(2) << std::setfill('0')
+                  << static_cast<int>(data[i]) << " ";
+    std::cout << std::dec << "\n";
+}
+
+template <typename T>
+T readAndConvertToLE(const unsigned char* buffer, bool isBE) {
+    T value;
+    if (!isBE) {
+        std::memcpy(&value, buffer, sizeof(T));
+    } else {
+        unsigned char tmp[sizeof(T)];
+        for (size_t i = 0; i < sizeof(T); ++i)
+            tmp[i] = buffer[sizeof(T) - 1 - i];
+        std::memcpy(&value, tmp, sizeof(T));
+    }
+    return value;
+}
+
+void printField(const std::string& label, const unsigned char* data, bool isBE) {
+    if (label == "float") {
+        float val = readAndConvertToLE<float>(data, isBE);
+        std::cout << "  " << label << " = " << val << "\n";
+    } else if (label == "char[80]") {
+        std::cout << "  " << label << " = \"" << std::string(reinterpret_cast<const char*>(data)) << "\"\n";
+    } else if (label == "long") {
+        long val = readAndConvertToLE<long>(data, isBE);
+        std::cout << "  " << label << " = " << val << "\n";
+    } else if (label == "short") {
+        short val = readAndConvertToLE<short>(data, isBE);
+        std::cout << "  " << label << " = " << val << "\n";
+    } else if (label == "unsigned short") {
+        unsigned short val = readAndConvertToLE<unsigned short>(data, isBE);
+        std::cout << "  " << label << " = " << val << "\n";
+    } else if (label == "unsigned int") {
+        unsigned int val = readAndConvertToLE<unsigned int>(data, isBE);
+        std::cout << "  " << label << " = " << val << "\n";
+    } else if (label == "uint32_t") {
+        uint32_t val = readAndConvertToLE<uint32_t>(data, isBE);
+        std::cout << "  " << label << " = " << val << "\n";
+    } else if (label == "uint16_t") {
+        uint16_t val = readAndConvertToLE<uint16_t>(data, isBE);
+        std::cout << "  " << label << " = " << val << "\n";
+    }
+}
+
+void processBuffer(const std::vector<unsigned char>& buffer, const std::string& label, bool isBE) {
+    std::cout << "\n=== Fichier simulé : " << label << " ===\n";
+    printBytes(buffer.data(), buffer.size());
+
+    const unsigned char* ptr = buffer.data();
+
+    printField("uint32_t", ptr, isBE);        ptr += sizeof(uint32_t);
+    printField("float", ptr, isBE);           ptr += sizeof(float);
+    printField("short", ptr, isBE);           ptr += sizeof(short);
+    printField("unsigned short", ptr, isBE);  ptr += sizeof(unsigned short);
+    printField("unsigned int", ptr, isBE);    ptr += sizeof(unsigned int);
+    printField("uint16_t", ptr, isBE);        ptr += sizeof(uint16_t);
+    printField("char[80]", ptr, isBE);        ptr += 80;
+    printField("long", ptr, isBE);            ptr += sizeof(long);
+}
+
+int main() {
+    struct {
+        uint32_t u32 = 15;
+        float f = 3.14f;
+        short s = -123;
+        unsigned short us = 456;
+        unsigned int ui = 7890;
+        uint16_t u16 = 321;
+        const char* str = "Endianness Test!";
+        long l = -987654;
+    } data;
+
+    std::vector<unsigned char> bufferLE, bufferBE;
+
+    // Construction en little-endian
+    writeLE(bufferLE, data.u32);
+    writeLE(bufferLE, data.f);
+    writeLE(bufferLE, data.s);
+    writeLE(bufferLE, data.us);
+    writeLE(bufferLE, data.ui);
+    writeLE(bufferLE, data.u16);
+    writeCharArray(bufferLE, data.str, 80);
+    writeLE(bufferLE, data.l);
+
+    // Construction en big-endian
+    writeBE(bufferBE, data.u32);
+    writeBE(bufferBE, data.f);
+    writeBE(bufferBE, data.s);
+    writeBE(bufferBE, data.us);
+    writeBE(bufferBE, data.ui);
+    writeBE(bufferBE, data.u16);
+    writeCharArray(bufferBE, data.str, 80);
+    writeBE(bufferBE, data.l);
+
+    // Lecture et conversion vers LE
+    processBuffer(bufferLE, "Little-Endian (déjà LE)", false);
+    processBuffer(bufferBE, "Big-Endian (converti vers LE)", true);
+
+    return 0;
+}
