@@ -19,6 +19,7 @@ public:
 
 	void normalize();
 	void fill(double value);
+	void normalizePercentile(double pmin, double pmax);
 
 	uint32_t getWidth() const;
 	uint32_t getHeight() const;

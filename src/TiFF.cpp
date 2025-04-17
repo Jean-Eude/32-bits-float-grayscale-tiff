@@ -117,3 +117,26 @@ uint32_t TiFF::getHeight() const {
     return height;
 }
 
+void TiFF::normalizePercentile(double pmin, double pmax) {
+    if (data.empty()) return;
+
+    std::vector<double> sorted = data;
+    std::sort(sorted.begin(), sorted.end());
+
+    size_t n = sorted.size();
+    size_t idx_min = static_cast<size_t>(std::clamp(pmin, 0.0, 1.0) * n);
+    size_t idx_max = static_cast<size_t>(std::clamp(pmax, 0.0, 1.0) * n);
+
+    idx_min = std::min(idx_min, n - 1);
+    idx_max = std::min(std::max(idx_max, idx_min + 1), n - 1); // assure idx_max > idx_min
+
+    double vmin = sorted[idx_min];
+    double vmax = sorted[idx_max];
+
+    double range = vmax - vmin;
+    if (range <= 0.0) return;
+
+    for (auto& px : data) {
+        px = std::clamp((px - vmin) / range, 0.0, 1.0);
+    }
+}

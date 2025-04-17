@@ -1,0 +1,6 @@
+void TiFF::clear() {
+    data.clear();
+    width = height = 0;
+}
+
+// Penser à fermer le fichier close() aun cas où ce n'est pas déjà fait
