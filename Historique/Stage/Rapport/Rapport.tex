@@ -1,0 +1,149 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{lmodern}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+% Corriger ce que contient \leftmark pour les chapitres
+\renewcommand{\chaptermark}[1]{%
+  \markboth{CHAPITRE \thechapter. \ #1}{}%
+}
+
+\fancyhf{} % Réinitialise tout
+\fancyhead[L]{\nouppercase{\leftmark}} % Titre du chapitre
+\fancyfoot[L]{Evan COMBOT}
+\fancyfoot[C]{\thepage}
+\fancyfoot[R]{Université de Montpellier}
+
+% Appliquer aussi aux pages de style "plain"
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyhead[L]{\nouppercase{\leftmark}}
+  \fancyfoot[L]{Evan COMBOT}
+  \fancyfoot[C]{\thepage}
+  \fancyfoot[R]{Université de Montpellier}
+}
+
+\usepackage{titling}
+\usepackage{mathpazo}
+\usepackage{ragged2e}
+\usepackage{titlesec}
+\titleformat{\chapter}[display]{\normalfont\huge\bfseries}{\chaptername\ \thechapter}{10pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{-20pt}{30pt}
+\setcounter{tocdepth}{2}
+
+% === Pour gérer les marges58 ===
+\geometry{left=2.0cm, right=2.0cm, top=2.0cm, bottom=2.0cm}
+\onehalfspacing
+\usepackage[]{hyperref}
+
+
+\begin{document}
+\justifying
+
+\begin{titlepage}
+\begin{center}
+
+% === LOGOS ALIGNÉS EN LIGNE AVEC LÉGENDES EN GRAS ===
+\vspace*{0.5cm}
+\begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.85\textwidth]{Assets/UM.png}\\[0.2cm]
+    {\footnotesize\textbf{Université de Montpellier}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.85\textwidth]{Assets/Dpt_Info.png}\\[0.2cm]
+    {\footnotesize\textbf{Département Informatique -- IMAGINE}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.85\textwidth]{Assets/CEA.png}\\[0.2cm]
+    {\footnotesize\textbf{CEA -- Commissariat à l'énergie atomique et aux énergies alternatives}}
+\end{minipage}
+
+\vspace{1.8cm}
+
+% === ÉTABLISSEMENT & DIPLÔME ===
+{\Large \textbf{Université de Montpellier}}\\[0.2cm]
+{\normalsize Faculté des Sciences}\\[0.3cm]
+{\large \textbf{Master 2 Informatique -- Parcours \og IMAGINE \fg{}}}\\[1.5cm]
+
+% === TITRE DU DOCUMENT ===
+{\Huge \bfseries Rapport de Stage}\\[0.4cm]
+\rule{0.65\linewidth}{0.7pt}\\[1cm]
+
+{\large \textbf{Exploitation d'images de caractérisation de chaîne radiographique}}\\[0.5cm]
+\textit{Stage réalisé au sein du \textbf{Commissariat à l'énergie atomique et aux énergies alternatives}}\\[0.3cm]
+\textit{du \textbf{3 février 2025} au \textbf{1 août 2025}}\\[2cm]
+
+% === INFOS ÉTUDIANT & ENTREPRISE ===
+\begin{flushleft}
+\textbf{Réalisé par :} \hfill COMBOT Evan\\[0.15cm]
+\textbf{Année universitaire :} \hfill 2024--2025\\[0.15cm]
+\textbf{Tuteur en entreprise :} \hfill Nom Prénom\\[0.15cm]
+\textbf{Encadrant pédagogique :} \hfill PUECH William\\[0.15cm]
+\textbf{Adresse de l'entreprise :} \hfill CEA Gramat, 46500 Gramat, France
+\end{flushleft}
+
+\vfill
+{\small Date de rendu : 20 juin 2025}
+
+\end{center}
+\end{titlepage}
+
+%======================
+% Remerciements
+%======================
+\chapter*{Remerciements}
+\addcontentsline{toc}{chapter}{Remerciements}
+
+Je tiens à remercier toutes les personnes qui m'ont accompagné(e) durant ce stage. En particulier, je souhaite exprimer ma gratitude à :
+\begin{itemize}
+  \item Mon tuteur de stage en entreprise, M. Nom Prénom, pour son accueil, son encadrement et sa disponibilité ;
+  \item Mon encadrant pédagogique, M. PUECH William, pour ses conseils et son suivi régulier ;
+  \item Toute l'équipe du CEA pour leur soutien et leur bienveillance.
+\end{itemize}
+
+Merci également à mes enseignants du Master 2 IMAGINE pour la qualité de la formation dispensée.
+
+\tableofcontents
+\pagestyle{fancy}
+\newpage
+
+\chapter{Introduction}
+... % contenu identique
+
+\chapter{Présentation de l'entreprise}
+... % contenu identique
+
+\chapter{Présentation de la mission}
+... % à compléter
+
+\chapter{Environnement technique}
+... % à compléter
+
+\chapter{Veille technologique}
+... % à compléter
+
+\chapter{Missions réalisées}
+... % contenu identique avec tâches, technos, outils, etc.
+
+\chapter{Résultats et compétences développées}
+... % contenu identique
+
+\chapter{Conclusion}
+... % contenu identique
+
+\appendix
+\chapter{Annexes}
+... % contenu identique
+
+\end{document}
