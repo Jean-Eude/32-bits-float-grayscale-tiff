@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.4.21)  21 APR 2025 21:25
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.4.21)  23 APR 2025 00:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -451,7 +451,7 @@ LaTeX Info: Redefining \nameref on input line 46.
 \@outlinefile=\write3
 \openout3 = `Rapport.out'.
 
-<Assets/UM.png, id=44, 616.15762pt x 616.15762pt>
+<Assets/UM.png, id=128, 616.15762pt x 616.15762pt>
 File: Assets/UM.png Graphic file (type png)
 <use Assets/UM.png>
 Package pdftex.def Info: Assets/UM.png  used on input line 56.
@@ -486,12 +486,12 @@ LaTeX Font Info:    Trying to load font information for OT1+zplm on input line
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1zplm.fd
 File: ot1zplm.fd 2002/09/08 Fontinst v1.914 font definitions for OT1/zplm.
 )
-<Assets/Dpt_Info.png, id=45, 1036.71315pt x 727.7589pt>
+<Assets/Dpt_Info.png, id=129, 1036.71315pt x 727.7589pt>
 File: Assets/Dpt_Info.png Graphic file (type png)
 <use Assets/Dpt_Info.png>
 Package pdftex.def Info: Assets/Dpt_Info.png  used on input line 62.
 (pdftex.def)             Requested size: 123.34483pt x 86.58328pt.
-<Assets/CEA.png, id=46, 248.93pt x 203.76125pt>
+<Assets/CEA.png, id=130, 248.93pt x 203.76125pt>
 File: Assets/CEA.png Graphic file (type png)
 <use Assets/CEA.png>
 Package pdftex.def Info: Assets/CEA.png  used on input line 68.
@@ -512,10 +512,21 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.117 \tableofcontents
+l.122 \tableofcontents
                        [1
 
-] (./Rapport.toc)
+] (./Rapport.toc
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[2
+
+])
 \tf@toc=\write4
 \openout4 = `Rapport.toc'.
 
@@ -528,22 +539,8 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[2
-
-]
+[3]
 Chapitre 1.
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller to compensate:
-
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[3
-
-]
-Chapitre 2.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -555,7 +552,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [4
 
 ]
-Chapitre 3.
+Chapitre 2.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -567,7 +564,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [5
 
 ]
-Chapitre 4.
+Chapitre 3.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -579,7 +576,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [6
 
 ]
-Chapitre 5.
+Chapitre 4.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -591,7 +588,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [7
 
 ]
-Chapitre 6.
+Chapitre 5.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -603,7 +600,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [8
 
 ]
-Chapitre 7.
+Chapitre 6.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -615,7 +612,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [9
 
 ]
-Chapitre 8.
+Chapitre 7.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -627,7 +624,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [10
 
 ]
-Annexe A.
+Chapitre 8.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -638,27 +635,39 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 [11
 
+]
+Annexe A.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[12
+
 ] (./Rapport.aux)
 Package rerunfilecheck Info: File `Rapport.out' has not changed.
-(rerunfilecheck)             Checksum: 4ECEF7B738F16649AD21107D3C1696BA;1455.
+(rerunfilecheck)             Checksum: 1A958BE7371BA76DCBBFEF003C952C1A;4783.
  ) 
 Here is how much of TeX's memory you used:
- 11515 strings out of 478287
- 182021 string characters out of 5849289
- 492164 words of memory out of 5000000
- 29523 multiletter control sequences out of 15000+600000
+ 11561 strings out of 478287
+ 182576 string characters out of 5849289
+ 497188 words of memory out of 5000000
+ 29547 multiletter control sequences out of 15000+600000
  493321 words of font info for 67 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 60i,11n,63p,286b,426s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 60i,11n,63p,287b,672s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr/share/texlive/texmf-dist
 /fonts/type1/urw/palatino/uplbi8a.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/urw/palatino/uplr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palati
 no/uplri8a.pfb>
-Output written on Rapport.pdf (12 pages, 1064273 bytes).
+Output written on Rapport.pdf (13 pages, 1071531 bytes).
 PDF statistics:
- 141 PDF objects out of 1000 (max. 8388607)
- 112 compressed objects within 2 object streams
- 23 named destinations out of 1000 (max. 500000)
- 96 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 258 PDF objects out of 1000 (max. 8388607)
+ 227 compressed objects within 3 object streams
+ 45 named destinations out of 1000 (max. 500000)
+ 264 words of extra memory for PDF output out of 10000 (max. 10000000)
 
