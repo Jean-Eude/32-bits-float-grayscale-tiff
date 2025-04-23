@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.4.21)  23 APR 2025 00:43
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.4.21)  24 APR 2025 00:27
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -451,7 +451,7 @@ LaTeX Info: Redefining \nameref on input line 46.
 \@outlinefile=\write3
 \openout3 = `Rapport.out'.
 
-<Assets/UM.png, id=128, 616.15762pt x 616.15762pt>
+<Assets/UM.png, id=108, 616.15762pt x 616.15762pt>
 File: Assets/UM.png Graphic file (type png)
 <use Assets/UM.png>
 Package pdftex.def Info: Assets/UM.png  used on input line 56.
@@ -486,12 +486,12 @@ LaTeX Font Info:    Trying to load font information for OT1+zplm on input line
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1zplm.fd
 File: ot1zplm.fd 2002/09/08 Fontinst v1.914 font definitions for OT1/zplm.
 )
-<Assets/Dpt_Info.png, id=129, 1036.71315pt x 727.7589pt>
+<Assets/Dpt_Info.png, id=109, 1036.71315pt x 727.7589pt>
 File: Assets/Dpt_Info.png Graphic file (type png)
 <use Assets/Dpt_Info.png>
 Package pdftex.def Info: Assets/Dpt_Info.png  used on input line 62.
 (pdftex.def)             Requested size: 123.34483pt x 86.58328pt.
-<Assets/CEA.png, id=130, 248.93pt x 203.76125pt>
+<Assets/CEA.png, id=110, 248.93pt x 203.76125pt>
 File: Assets/CEA.png Graphic file (type png)
 <use Assets/CEA.png>
 Package pdftex.def Info: Assets/CEA.png  used on input line 68.
@@ -512,21 +512,10 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.122 \tableofcontents
+l.123 \tableofcontents
                        [1
 
-] (./Rapport.toc
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller to compensate:
-
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[2
-
-])
+] (./Rapport.toc)
 \tf@toc=\write4
 \openout4 = `Rapport.toc'.
 
@@ -539,8 +528,28 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[3]
+[2
+
+]
 Chapitre 1.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[3
+
+]
+Chapitre 2.
+
+Overfull \hbox (2.85457pt too wide) in paragraph at lines 162--163
+[]\T1/ppl/b/n/12 La Di-rec-tion de la re-cherche fon-da-men-tale (DRF) \T1/ppl/
+m/n/12 : dé-diée à l'ex-plo-ra-tion des sciences
+ []
+
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -552,7 +561,6 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [4
 
 ]
-Chapitre 2.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -561,9 +569,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[5
-
-]
+[5]
 Chapitre 3.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -624,7 +630,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [10
 
 ]
-Chapitre 8.
+Annexe A.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -635,39 +641,42 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 [11
 
-]
-Annexe A.
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller to compensate:
-
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[12
-
 ] (./Rapport.aux)
-Package rerunfilecheck Info: File `Rapport.out' has not changed.
-(rerunfilecheck)             Checksum: 1A958BE7371BA76DCBBFEF003C952C1A;4783.
+
+Package rerunfilecheck Warning: File `Rapport.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `Rapport.out':
+(rerunfilecheck)             Before: D763C0DC9C4C5965124C8040CDB2FF06;4145
+(rerunfilecheck)             After:  F1437F8A32F5DAC5112141C2E2191DF2;4688.
  ) 
 Here is how much of TeX's memory you used:
- 11561 strings out of 478287
- 182576 string characters out of 5849289
- 497188 words of memory out of 5000000
- 29547 multiletter control sequences out of 15000+600000
+ 11558 strings out of 478287
+ 182601 string characters out of 5849289
+ 497184 words of memory out of 5000000
+ 29545 multiletter control sequences out of 15000+600000
  493321 words of font info for 67 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 60i,11n,63p,287b,672s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
-e/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/urw/palatino/uplbi8a.pfb></usr/share/texlive/texmf-dist/fonts/type
-1/urw/palatino/uplr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palati
-no/uplri8a.pfb>
-Output written on Rapport.pdf (13 pages, 1071531 bytes).
+ 60i,11n,63p,1275b,490s stack positions out of 5000i,500n,10000p,200000b,80000s
+pdfTeX warning (dest): name{section.7.3} has been referenced but does not exi
+st, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsection.2.2.2} has been referenced but does not 
+exist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsection.2.2.1} has been referenced but does not 
+exist, replaced by a fixed one
+
+{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texlive/
+texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr/share/texlive/texmf-dist/f
+onts/type1/urw/palatino/uplbi8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+urw/palatino/uplr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino
+/uplri8a.pfb>
+Output written on Rapport.pdf (12 pages, 1074850 bytes).
 PDF statistics:
- 258 PDF objects out of 1000 (max. 8388607)
- 227 compressed objects within 3 object streams
- 45 named destinations out of 1000 (max. 500000)
- 264 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 236 PDF objects out of 1000 (max. 8388607)
+ 206 compressed objects within 3 object streams
+ 44 named destinations out of 1000 (max. 500000)
+ 224 words of extra memory for PDF output out of 10000 (max. 10000000)
 
