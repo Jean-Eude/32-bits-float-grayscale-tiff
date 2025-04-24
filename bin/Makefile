@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/evan/Bureau/32-bits-float-grayscale-tiff/bin
+CMAKE_SOURCE_DIR = /home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/bin
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/evan/Bureau/32-bits-float-grayscale-tiff/bin
+CMAKE_BINARY_DIR = /home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/bin
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/evan/Bureau/32-bits-float-grayscale-tiff/bin/CMakeFiles /home/evan/Bureau/32-bits-float-grayscale-tiff/bin//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/bin/CMakeFiles /home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/bin//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/evan/Bureau/32-bits-float-grayscale-tiff/bin/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/bin/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -129,53 +129,53 @@ main/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
-home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.o: home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o
-.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.o
+home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.o: home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.cpp.o
+.PHONY : home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.o
 
 # target to build an object file
-home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o
-.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.o
+home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.cpp.o
+.PHONY : home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.cpp.o
 
-home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.i: home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.i
-.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.i
+home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.i: home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.cpp.i
+.PHONY : home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.i
 
 # target to preprocess a source file
-home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.i
-.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.i
+home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.cpp.i
+.PHONY : home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.cpp.i
 
-home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.s: home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.s
-.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.s
+home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.s: home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.cpp.s
+.PHONY : home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.s
 
 # target to generate assembly for a file
-home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.s
-.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.cpp.s
+home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.cpp.s
+.PHONY : home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.cpp.s
 
-home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.o: home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o
-.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.o
+home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.o: home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.cpp.o
+.PHONY : home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.o
 
 # target to build an object file
-home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o
-.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.o
+home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.cpp.o
+.PHONY : home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.cpp.o
 
-home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.i: home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.i
-.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.i
+home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.i: home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.cpp.i
+.PHONY : home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.i
 
 # target to preprocess a source file
-home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.i
-.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.i
+home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.cpp.i
+.PHONY : home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.cpp.i
 
-home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.s: home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.s
-.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.s
+home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.s: home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.cpp.s
+.PHONY : home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.s
 
 # target to generate assembly for a file
-home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.s
-.PHONY : home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.cpp.s
+home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.cpp.s
+.PHONY : home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.cpp.s
 
 # Help Target
 help:
@@ -186,12 +186,12 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... main"
-	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.o"
-	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.i"
-	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/TiFF.s"
-	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.o"
-	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.i"
-	@echo "... home/evan/Bureau/32-bits-float-grayscale-tiff/src/main.s"
+	@echo "... home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.o"
+	@echo "... home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.i"
+	@echo "... home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/TiFF.s"
+	@echo "... home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.o"
+	@echo "... home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.i"
+	@echo "... home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/src/main.s"
 .PHONY : help
 
 

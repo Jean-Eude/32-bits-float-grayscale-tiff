@@ -21,10 +21,6 @@ except Exception as e:
 # Check dtype
 print(f"Dtype de l'image : {image_data.dtype}, shape : {image_data.shape}")
 
-# Normalize for display
-if image_data.max() > 0:
-    image_data = (image_data - image_data.min()) / (image_data.max() - image_data.min())
-
 # Display
 plt.figure(figsize=(8, 6))
 plt.imshow(image_data, cmap='gray', aspect='auto')

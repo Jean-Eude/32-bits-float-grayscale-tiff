@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/evan/Bureau/32-bits-float-grayscale-tiff/bin/../include
+CXX_INCLUDES = -I/home/evan/Bureau/Stage/32-bits-float-grayscale-tiff/bin/../include
 
 CXX_FLAGS = -Wall -Ofast -std=c++17
 
