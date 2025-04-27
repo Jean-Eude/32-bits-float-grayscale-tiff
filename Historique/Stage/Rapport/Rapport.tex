@@ -4,6 +4,9 @@
 \usepackage[french]{babel}
 \usepackage{geometry}
 \usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
 \usepackage{lmodern}
 \usepackage{setspace}
 \usepackage{fancyhdr}
@@ -16,7 +19,7 @@
 
 \fancyhf{} % Réinitialise tout
 \fancyhead[L]{\nouppercase{\leftmark}} % Titre du chapitre
-\fancyfoot[L]{Evan COMBOT}
+\fancyfoot[L]{Evan Combot}
 \fancyfoot[C]{\thepage}
 \fancyfoot[R]{Université de Montpellier}
 
@@ -35,13 +38,16 @@
 \usepackage{titlesec}
 \titleformat{\chapter}[display]{\normalfont\huge\bfseries}{\chaptername\ \thechapter}{10pt}{\Huge}
 \titlespacing*{\chapter}{0pt}{-20pt}{30pt}
-\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{5}
 
 % === Pour gérer les marges58 ===
 \geometry{left=2.0cm, right=2.0cm, top=2.0cm, bottom=2.0cm}
 \onehalfspacing
 \usepackage[]{hyperref}
 
+\titleformat{\subsubsection}[block]{\bfseries\Large}{\thesubsubsection}{1em}{}
+\titleformat{\paragraph}[block]{\bfseries\large}{\theparagraph}{1em}{}
+\titleformat{\subparagraph}[block]{\bfseries\normalsize}{\thesubparagraph}{1em}{}
 
 \begin{document}
 \justifying
@@ -116,27 +122,24 @@ Je remercie tout particulièrement :
 
 Je tiens également à remercier l’ensemble des enseignants du Master 2 IMAGINE pour la qualité de l’enseignement et les compétences qu’ils m’ont permis d’acquérir.
 
-\vspace{1em}
-Merci à toutes et à tous.
-
-
 \tableofcontents
 \pagestyle{fancy}
 \newpage
 
-
 \chapter{Introduction}
 \section{Contexte du stage}
-\section{Objectifs du rapport}
-Ce rapport à pour objectif de présenter le déroulement de mon stage, réalisé au sein du CEA dans le cadre du stage de fin d'études du MAster 2 IMAGINE.
+Mon stage se déroule au sein du Commissariat à l'Énergie Atomique et aux Énergies Alternatives (CEA), un organisme public de recherche reconnu dans les domaines de l'énergie, de la défense, des technologies de l'information et de la santé.
 
-Plus précisément, ce document a pour buts de :
+Ce stage s'inscrit dans le cadre du Master IMAGINE, un parcours dédié au traitement d'images, à la 3D et à l'intelligence artificielle. L'objectif global était d'appliquer les connaissances acquises durant la formation à un projet de recherche et développement en lien avec l'imagerie radiographique.
+
+\section{Objectifs du rapport}
+Ce rapport à pour objectif de présenter le déroulement de mon stage. Plus précisément, ce document a pour buts :
 \begin{itemize}
-  \item Expliquer le cadre général du stage et les objectifs fixés en début de mission ;
-  \item Décrire les différentes tâches réalisées et les méthodologies employées ;
-  \item Mettre en évidence les outils et technologies utilisés dans le contexte professionnel ;
-  \item Présenter les résultats obtenus et les éventuelles difficultés rencontrées ;
-  \item Faire un bilan personnel et professionnel sur les acquis du stage.
+  \item Expliquer le cadre général du stage et les objectifs fixés en début de mission
+  \item Décrire les différentes tâches réalisées et les méthodologies employées
+  \item Mettre en évidence les outils et technologies utilisés dans le contexte professionnel
+  \item Présenter les tâches effectués et les difficlutés rencontrés
+  \item Faire un bilan personnel et professionnel sur les acquis du stage
 \end{itemize}
 
 L'ensemble de ce rapport permet également la mise en pratique des connaissances théoriques acquises tout au long de la formation tout en intégrant les acquis du stage dans le développement de nouvelles compétences.
@@ -147,39 +150,90 @@ L'ensemble de ce rapport permet également la mise en pratique des connaissances
 \section{Le Commissariat à l'énergie atomique et aux énergies alternatives}
 \subsection{Historique}
 
-L'origine du Commissariat à l'énergie atomique (CEA) remonte à novembre 1895, lorsque le physicien allemand Wilhelm Conrad Röntgen découvre un rayonnement invisible et inconnu qu'il appelle \textit{rayon X}. En 1896, Henri Becquerel, un physicien français, découvre le phénomène de la radioactivité naturelle en observant une émission de rayons, analogues aux rayons X, dans les composés de l'uranium. Deux ans plus tard, Pierre et Marie Curie démontrent que certains minerais naturels émettent plus de rayons que d'autres et mettent en évidence deux éléments très radioactifs : le polonium et le radium. En 1934, Irène et Frédéric Joliot-Curie « imitent » la nature en créant un nouveau corps radioactif, le phosphore-30. Ils découvrent ainsi la radioactivité artificielle et pensent qu'en cassant des atomes, il serait possible de provoquer des réactions en chaîne explosives, libérant une énorme quantité d’énergie. C'est ce qu'on appelle la \textit{fission nucléaire}. Après la Seconde Guerre mondiale, le général de Gaulle est convaincu de la nécessité de fonder un organisme national consacré à l'énergie nucléaire. Par l'ordonnance du 18 octobre 1945, le \textit{Commissariat à l'énergie atomique (CEA)} est créé. En 2009, le CEA étend son champ d'action pour inclure les énergies renouvelables et devient officiellement le \textit{Commissariat à l'énergie atomique et aux énergies renouvelables (CEA)}.
+L'origine du Commissariat à l'énergie atomique (CEA) s'inscrit dans une série de découvertes scientifiques majeures entamées à la fin du XIX\textsuperscript{e} siècle. En novembre 1895, le physicien allemand Wilhelm Conrad Röntgen découvre un rayonnement invisible et inconnu, qu'il nomme \textit{rayons X}. En 1896, le physicien français Henri Becquerel met en évidence le phénomène de la radioactivité naturelle en observant l'émission spontanée de rayons analogues aux rayons X par des composés d'uranium. Deux ans plus tard, Pierre et Marie Curie montrent que certains minerais naturels émettent davantage de rayonnements et découvrent deux éléments particulièrement radioactifs : le polonium et le radium. En 1934, Irène et Frédéric Joliot-Curie réalisent la première création de nouveaux éléments radioactifs par l’homme, en produisant du phosphore-30, découvrant ainsi la radioactivité artificielle. Ils envisagent alors que la fission des atomes puisse entraîner des réactions en chaîne libérant d'immenses quantités d’énergie. Après la Seconde Guerre mondiale, conscient des enjeux scientifiques et stratégiques liés à l'énergie nucléaire, le général de Gaulle décide de créer un organisme national dédié à ce domaine. Par ordonnance du 18 octobre 1945, le \textit{Commissariat à l'énergie atomique (CEA)} est officiellement fondé. En 2009, afin de refléter l’élargissement de ses missions aux nouvelles formes d'énergie, il devient le \textit{Commissariat à l'énergie atomique et aux énergies alternatives (CEA)}.
 
 \subsection{Activités}
-Actuellement, le \textit{Commissariat à l'énergie atomique et aux énergies alternatives (CEA)} est structuré autour de quatre grandes directions opérationnelles, chacune ayant un champ de compétences spécifique :
+Actuellement, le \textit{Commissariat à l'énergie atomique et aux énergies alternatives (CEA)} est structuré autour de quatre grandes directions opérationnelles, chacune spécialisée dans un domaine spécifique :
 
-\begin{itemize}
-  \item \textbf{La Direction des énergies (DES)} : chargée des recherches dans le domaine de l’énergie nucléaire civile, des systèmes énergétiques innovants et de la transition énergétique.
-  
-  \item \textbf{La Direction des applications militaires (DAM)} : responsable des missions liées à la défense nationale, notamment la dissuasion nucléaire et la sécurité des installations.
+\begin{itemize} \item \textbf{La Direction des énergies (DES)} : mène des recherches sur l’énergie nucléaire civile, les systèmes énergétiques innovants et la transition énergétique.
 
-  \item \textbf{La Direction de la recherche technologique (DRT)} : orientée vers l’innovation technologique et les partenariats industriels, en particulier dans les domaines de la microélectronique, des systèmes intelligents et des énergies renouvelables.
+\item \textbf{La Direction des applications militaires (DAM)} : assure les missions de défense nationale, notamment la dissuasion nucléaire et la sécurité des installations.
 
-  \item \textbf{La Direction de la recherche fondamentale (DRF)} : dédiée à l’exploration des sciences fondamentales, telles que la physique nucléaire, la biologie, la climatologie ou encore les sciences de l’univers.
-\end{itemize}
+\item \textbf{La Direction de la recherche technologique (DRT)} : développe des innovations technologiques et des partenariats industriels, notamment dans la microélectronique, les systèmes intelligents et les énergies renouvelables.
+
+\item \textbf{La Direction de la recherche fondamentale (DRF)} : explore les sciences fondamentales, telles que la physique nucléaire, la biologie, la climatologie et les sciences de l’univers. \end{itemize}
 
 \subsection{Organisation}
-Aujourd'hui, le CEA est composé de neuf centres de recherches dont six sont militaires, dirigé par la DAM et cinq sont destinés pour des applications civiles. C'est également cinquante-deux unités mixtes de recherche (UMR), 725 dépôts de brevets prioritaires, vingt-six Équipex (équipements d'excellence), de seize Labex (laboratoires d'excellence) et un effectif total de 16564 employés en 2023.
+Aujourd'hui, le CEA est composé de neuf centres de recherche, dont certains sont placés sous la responsabilité de la \textit{Direction des applications militaires (DAM)} pour des missions de défense, tandis que d'autres sont dédiés aux applications civiles. Il regroupe également cinquante-deux unités mixtes de recherche (UMR), a déposé 725 brevets prioritaires, dispose de vingt-six équipements d’excellence (Équipex) et de seize laboratoires d’excellence (Labex). En 2023, le CEA comptait un effectif total de 16 564 employés.
 
 
 \section{La Direction des Applications Militaires}
 \subsection{Historique \& activités}
-La direction des applications militaires est créée secrètement en 1955 sous le nom de Bureau d'étude générales (BEG). Ce n'est qu'en 1958 que le génréral De Gaulle décide de créer la Direction des applications militaires, la DAM, au sein du Commissariat à l’Energie Atomique. Les armes nucléaires, les réacteurs nucléaires pour la propulsion navale et les matières nucléaires stratégiques sont au cœur de sa mission pour la dissuasion nucléaire française. Aujourd'hui, la DAM permet de contribuer à l'excellence de la recherche, à la compétitivité de l'industrie, à surveiller, analyser et intervenir pour la défense et la sécurité et également de répondre aux enjeux de la dissuasion nucléaire. Aujourd'hui la Direction des applications militaires comptait près de 4 802 employés en 2023.
+La Direction des applications militaires (DAM) a été créée secrètement en 1955 sous le nom de \textit{Bureau d'études générales (BEG)}. Ce n'est qu'en 1958 que le général de Gaulle officialise la création de la DAM au sein du Commissariat à l'énergie atomique (CEA). Les armes nucléaires, les réacteurs nucléaires pour la propulsion navale et les matières nucléaires stratégiques constituent le cœur de sa mission, centrée sur la dissuasion nucléaire française.
+Aujourd'hui, la DAM contribue à l'excellence de la recherche, renforce la compétitivité industrielle, assure la surveillance, l'analyse et l'intervention pour la défense et la sécurité nationale, tout en répondant aux enjeux liés à la dissuasion nucléaire. En 2023, elle comptait près de 4 802 employés.
 \subsection{Le centre de Bruyères-le-Châtel}
-
-
+Le centre de Bruyères-le-Châtel, connu sous le nom de \textit{CEA-DIF} ou par son nom de code \textit{BIII} (B3), regroupe près de 2 000 ingénieurs, chercheurs et techniciens. Ils conçoivent les réacteurs nucléaires des sous-marins français et du porte-avions \textit{Charles de Gaulle}, ainsi que les armes nucléaires françaises, en s’appuyant notamment sur le programme \textit{Simulation}. Le centre participe également à la lutte contre la prolifération et le terrorisme nucléaire.
+Premier site officiel de la \textit{Direction des applications militaires (DAM)}, sous le code \textit{BIII}, c’est sur ce site qu’a été conçue la première bombe atomique française, \textit{Gerboise Bleue}. Le centre aurait par ailleurs fabriqué plus de 90 \% des armes nucléaires testées lors des essais français au Sahara et dans le Pacifique.
 
 \chapter{Présentation de la mission}
 \section{Contexte de la mission}
+ Dans un contexte d'amélioration et de refactorisation de codes précédents, l'objectif principal de ma stage a été de .... .Cette modélisation permettra de ...
+
+
+
+Exemple ! : Au CEA, mon travail s'est inscrit dans une démarche d'innovation visant à modéliser une chaîne radiographique complète. Cette modélisation a pour ambition de mieux comprendre le comportement du système d'imagerie, d'optimiser ses performances et d'améliorer la qualité des images obtenues, tout en respectant les contraintes liées à la radioprotection.
+
+Le stage a ainsi offert un cadre idéal pour mettre en pratique des compétences en physique médicale, traitement du signal et programmation, au service d'une problématique appliquée et concrète.
+
+
 Contexte professionnel de ta mission, ce que tu devais faire, les enjeux, la méthodologie, les objectifs pratiques.
 
-qui s'incrit dans le programme SImulation
+qui s'incrit dans le programme Simulation
+
+\subsection{Le programme Simulation}
+Lancé en 1995, ce programme a pour objectif de pérenniser la dissuasion francçaise après l’arrêt définitif des essais nucléaires. Il a été bâti pour permettre le renouvellement et la garantie sur le long terme des armes qui équipent les deux composantes de la dissuasion nucléaire française. Il a également comme objectif de permettre de former les experts dans le domaine extrêmement « pointu » et spécifique du fonctionnement des armes nucléaires. Le programme Simulation n’est autre que la démarche scientifique appliquée aux armes et s'articule autour de trois axes :
+\renewcommand{\labelitemi}{$\bullet$}
+\begin{itemize}
+\item \textbf{La physique des armes} : définissant la modélisation de tous les phénomènes physiques intervenant dans leur fonctionnement. Cela consiste à élaborer et sélectionner les modèles physiques destinés à reproduire par le calcul les trois phases de fonctionnement d’une
+arme nucléaire : pyrotechnique, fission et fusion. Ces modèles sont enchaînés de façon à obtenir un système d’équations mathématiques reproduisant le plus fidèlement possible le fonctionnement
+d’une arme nucléaire. La mécanique des fluides, le calcul des flux de neutrons (la neutronique) mais aussi l’évolution de la matière et des photons sont des éléments importants.
+
+\begin{figure}[H]
+    \centering % <--- ici pour tout centrer
+    \includegraphics[height=5cm]{Assets/Physique_arme.png}
+        %\caption{Liaisons entre les classes du moteur}
+\end{figure}
+
+
+
+
+\item \textbf{La simulation numérique} : reproduisant leur fonctionnement à l'aide de calculs et de modèles informatiques. Simuler une arme nuclaire nécessite d'un centaine à des centaines de millions de mailles ce qui implique que les systèmes d'équations associés ont alors des milliards d'inconnues. Cela nécessite alors de disposer d’ordinateurs très puissants
+pour conserver une durée de calcul acceptable. Trois générations de supercalculateurs ont été définies et réalisées pour mettre en œuvre les standards de garantie : TERA 1, en 2001, avec 5 teraflops / TERA 10, en 2005, avec 50 teraflops /  TERA 100, en 2010, avec 1,3 petaflops
+
+\begin{figure}[H]
+    \hspace{0cm} % <<== Décale tout vers la gauche
+    \begin{subfigure}[t]{0.42\textwidth}
+        \centering
+        \includegraphics[height=5cm]{Assets/Exemple_Simulation.png}
+        \caption{Liaisons entre les classes du moteur}
+    \end{subfigure}
+    \hspace{10em} % <<== Espace entre les deux images
+    \begin{subfigure}[t]{0.42\textwidth}
+        \centering
+        \includegraphics[height=5cm]{Assets/Supercalculateur.png}
+        \caption{Supercalculateur utilisé pour les simulations}
+    \end{subfigure}
+    \caption{Illustrations du fonctionnement du programme Simulation}
+    \label{fig:images}
+\end{figure}
+
+\item \textbf{La validation expérimentale} : vérifiant expérimentalement les résultats des simulations et des modélisations à l'aide de deux grandes installations, l'installation EPURE qui est une installation de radiographie dédiée à la phase non nucléaire du fonctionnement de l'arme et l'installation du Laser Mégajoule qui est un "laser de puissance" permettant de reproduire à toute petite échelle les conditions physiques dans lesquelles se trouve la matière lors du fonctionnement nucléaire de l'arme.
+\end{itemize}
+
 \section{Enjeux et objectifs}
 ... % à compléter
+
+
 
 \chapter{Environnement technique}
 \section{Technologies utilisées}
@@ -192,32 +246,76 @@ Ce que tu as appris ou approfondi pour comprendre les bases scientifiques ou tec
 
 Explications machine + phsique théorique sur les onde
 Imagerie par Rayons X et par neutrons
-
 ... % à compléter
+\section{Modélisation d'une chaîne radiographique}
+\subsection{Présentation générale des techniques d'imagerie par rayonnements}
+\paragraph{Comparaison entre l’imagerie par rayons X, rayons gamma et neutronographie}
+
+\subsection{Modélisation}
+Pour bien comprendre le sujet, il est important de comprendre comment une chaîne radiographique fonctionne.
+
+
+\paragraph{Génération de rayons X}
+\paragraph{Interactions rayons X / matière}
+\paragraph{Détection}
+\begin{itemize}
+    \item Le processus de conversion des rayons X en signal électronique (ex : scintillateurs, photodiodes, détecteurs plans).
+    \item Le modèle de réponse du détecteur (efficacité quantique, bruit de détection, résolution spatiale).
+    \item L'influence des caractéristiques du détecteur sur la qualité de l'image finale (SNR, MTF).
+\end{itemize}
+\paragraph{Acquisition}
+La phase d'acquisition regroupe le traitement du signal issu du détecteur pour former l'image numérique finale. Cette étape inclut :
+\begin{itemize}
+    \item La numérisation du signal (quantification, échantillonnage) ;
+    \item L'application éventuelle de pré-traitements (correction du gain, réduction du bruit) ;
+    \item Le formatage et l'optimisation des données pour l'affichage et l'analyse.
+\end{itemize}
+
+\section{Principe de fonctionnement de l'installation EPURE}
+\subsection{Description de l'installation}
+\subsection{Les trois axes radiographiques}
+\paragraph{Le 1er axe radiographique : Airix}
+\paragraph{Le 2ème axe radiographique : Merlin}
+\paragraph{Le 3ème axe radiographique : ...}
+\subsection{Les trois axes radiographiques}
+\subsection{Le déroulement d'une expérience à un axe radiographique}
+\subsection{L'enregistrement d'images radiographiques}
+\paragraph{Gamma caméra}
+\subparagraph{Principe}
+\subparagraph{Détection}
+\subparagraph{Acquisition}
+
 
 \chapter{Missions réalisées}
 \section{Tâches effectuées}
+\subsection{1ère tâche}
+\subsection{2ème tâche}
+\subsection{3ème tâche}
+\subsection{Finalité}
 \section{Méthodologie}
 \section{Difficultés rencontrées}
 ... % contenu identique avec tâches, technos, outils, etc.
+\subsection{Voir Gantt pour faire les autres sous chapitres}
+\section{Améliorations possibles}
 
 
-\section{Compétences transversales}
-Par ailleurs, à l’occasion d’une formation interne organisée en début de stage, j’ai eu l’opportunité de visiter ... centre calcul
-
-\subsection{Compétences professionnelles principales}
-\subsection{Compétences acquises par des formations}
-
-
-... % contenu identique
 
 \chapter{Conclusion}
 \section{Bilan du stage}
-\section{Perspectives}
-... % contenu identique
+physique + traitement d'images = C'est cool + faire un bilan global de ce qui a été fait + sur ce qui pourrait être fait
+
+\section{Perspectives sur mon avenir}
+% contenu identique
+Ce stage m'a conforté dans mon souhait de poursuivre dans un domaine mêlant le traitement d'images et la physique. Je souhaite continuer à développer mes compétences dans cette double spécialité, en travaillant sur des projets alliant aspects théoriques et applications pratiques.  
+Concernant la poursuite d'études, je me projette vers une éventuelle thèse, mais pas immédiatement. En effet, après trois années très intensives en Licence 3 et en Master, je préfère prendre une année pour approfondir mes choix, trouver un emploi afin de me reposer et identifier un sujet de doctorat qui corresponde pleinement à mes aspirations.
+
+\chapter{Glossaire}
+
 
 \appendix
 \chapter{Annexes}
 
-
+\chapter{Bibliographie}
+% https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://reporterre.net/Bruyeres-le-Chatel-Essonne&ved=2ahUKEwjFm4m12vaMAxWufKQEHadBNEIQFnoECBMQAw&usg=AOvVaw3fVEsHbaAEx2_p7_cmjm5C
+% https://www.cea.fr/presse/Documents/actualites/20-ans-programme-simulation.pdf
 \end{document}
