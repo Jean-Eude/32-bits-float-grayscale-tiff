@@ -1,0 +1,78 @@
+1. Fonction ones(rows, cols) → Crée un std::vector<double>
+
+#include <vector>
+
+std::vector<double> ones(int rows, int cols) {
+    return std::vector<double>(rows * cols, 1.0);
+}
+
+2. Fonction cumsum_dim1 (cumulative sum sur les lignes, comme cumsum(...,1))
+
+std::vector<double> cumsum_dim1(const std::vector<double>& mat, int rows, int cols) {
+    std::vector<double> result(mat); // copie initiale
+
+    for (int j = 0; j < cols; ++j) {
+        for (int i = 1; i < rows; ++i) {
+            result[i * cols + j] += result[(i - 1) * cols + j];
+        }
+    }
+
+    return result;
+}
+
+3. Fonction cumsum_dim2 (cumulative sum sur les colonnes, comme cumsum(...,2))
+
+std::vector<double> cumsum_dim2(const std::vector<double>& mat, int rows, int cols) {
+    std::vector<double> result(mat); // copie initiale
+
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 1; j < cols; ++j) {
+            result[i * cols + j] += result[i * cols + (j - 1)];
+        }
+    }
+
+    return result;
+}
+
+4. Fonction d'affichage (print_matrix)
+
+#include <iostream>
+
+void print_matrix(const std::vector<double>& mat, int rows, int cols) {
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            std::cout << mat[i * cols + j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+5. Programme principal (combinaison ones → cumsum)
+
+#include <iostream>
+#include <vector>
+
+// ici on insère tout ce qu'on a défini au-dessus...
+
+int main() {
+    int rows = 4;
+    int cols = 5;
+
+    // Créer une matrice de 1
+    std::vector<double> mat = ones(rows, cols);
+
+    std::cout << "Matrice ones() :\n";
+    print_matrix(mat, rows, cols);
+
+    // Appliquer cumsum sur les lignes (dim1)
+    std::vector<double> cumsum1 = cumsum_dim1(mat, rows, cols);
+    std::cout << "\nCumsum sur dimension 1 (cumsum(..., 1)) :\n";
+    print_matrix(cumsum1, rows, cols);
+
+    // Appliquer cumsum sur les colonnes (dim2)
+    std::vector<double> cumsum2 = cumsum_dim2(mat, rows, cols);
+    std::cout << "\nCumsum sur dimension 2 (cumsum(..., 2)) :\n";
+    print_matrix(cumsum2, rows, cols);
+
+    return 0;
+}

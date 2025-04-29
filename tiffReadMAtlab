@@ -1,0 +1,28 @@
+% Lecture d'un fichier .tiff 64 bits (double)
+% Nom du fichier TIFF
+filename = 'mon_image.tiff';
+
+% Ouvrir le fichier TIFF
+t = Tiff(filename, 'r');
+
+% Lire l'image
+imageData = read(t);
+
+% Vérifier le type de données
+if ~isa(imageData, 'double')
+    warning('L''image n''est pas de type double. Type trouvé : %s', class(imageData));
+else
+    disp('Image lue correctement en 64 bits (double précision).');
+end
+
+% Afficher l'image si elle est 2D
+if ndims(imageData) == 2
+    figure;
+    imagesc(imageData);
+    axis image;
+    colorbar;
+    title('Image TIFF lue (double)');
+end
+
+% Fermer le fichier TIFF
+close(t);
