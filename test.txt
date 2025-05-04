@@ -1,0 +1,78 @@
+#include <iostream>
+#include <vector>
+
+
+// img[i] * mask1[i] * mask2[i]
+int main() {
+    // Vecteurs 1D représentant une "image" à plat
+    std::vector<float> img   = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<float> mask1 = {1, 0, 1, 0, 1, 0, 1, 0, 1};
+    std::vector<float> mask2 = {0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5};
+
+    std::vector<float> img_fin(img.size());
+
+    // Multiplication élément par élément
+    for (size_t i = 0; i < img.size(); ++i) {
+        img_fin[i] = img[i] * mask1[i] * mask2[i];
+    }
+
+    // Affichage brut
+    for (float val : img_fin) {
+        std::cout << val << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+
+
+#include <iostream>
+#include <vector>
+
+int main() {
+    std::vector<float> vec   = {10, 20, 30, 40, 50, 60};  // taille 6
+    std::vector<float> xdet  = {0.2, 0.45, 0.5, 0.7};      // taille 4
+
+    std::vector<float> result;
+
+    size_t N = std::min(vec.size(), xdet.size());
+
+    for (size_t i = 0; i < N; ++i) {
+        if (xdet[i] > 0.4f && xdet[i] < 0.6f) {
+            result.push_back(vec[i]);
+        }
+    }
+
+    // Affichage
+    for (float val : result) {
+        std::cout << val << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+vec(xdet > 0.4 & xdet < 0.6)
+
+#include <iostream>
+#include <vector>
+
+int main() {
+    std::vector<float> Redet = {10, 12, 14, 16, 18};
+    float rayon = 12.0;
+
+    for (size_t i = 0; i < Redet.size(); ++i) {
+        if (Redet[i] < rayon * 1.1f || Redet[i] > rayon * 1.3f) {
+            Redet[i] = 0.0f;
+        }
+    }
+
+    // Affichage
+    for (float val : Redet) {
+        std::cout << val << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+masque = (Redet < (rayon * 1.1)) | (Redet > (rayon * 1.3));
+Redet(masque) = 0;
