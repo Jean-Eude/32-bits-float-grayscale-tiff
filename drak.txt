@@ -1,0 +1,120 @@
+This C++ function takes a TiFF image, applies gradient + Laplacian filtering with the conditional mask (lap * grad < 0), and writes the result into another TiFF object.
+
+#include <vector>
+#include <cmath>
+#include "TiFF.hpp"
+
+// Kernel generation (gradient + Laplacian)
+void generateKernels(int a, std::vector<double>& noyaux, std::vector<double>& noyauy, std::vector<double>& noyau) {
+    int size = 2 * a + 1;
+    noyaux.resize(size * size);
+    noyauy.resize(size * size);
+    noyau.resize(size * size);
+
+    double bsum = 0.0;
+    for (int i = -a; i <= a; ++i) bsum += i * i;
+    double norm = bsum / (2 * a + 1);
+
+    for (int y = 0; y < size; ++y) {
+        for (int x = 0; x < size; ++x) {
+            double dx = x - a;
+            double dy = y - a;
+            int idx = y * size + x;
+            noyaux[idx] = dx;
+            noyauy[idx] = dy;
+            noyau[idx] = dx * dx + dy * dy - 2 * norm;
+        }
+    }
+}
+
+// Valid 2D convolution using getPixel (no padding)
+std::vector<double> convolveValid(const TiFF& image, const std::vector<double>& kernel, int kw, int kh) {
+    int w = image.getWidth();
+    int h = image.getHeight();
+    int out_w = w - kw + 1;
+    int out_h = h - kh + 1;
+
+    std::vector<double> out(out_w * out_h, 0.0);
+
+    for (int y = 0; y < out_h; ++y) {
+        for (int x = 0; x < out_w; ++x) {
+            double sum = 0.0;
+            for (int ky = 0; ky < kh; ++ky) {
+                for (int kx = 0; kx < kw; ++kx) {
+                    double val = image.getPixel(x + kx, y + ky);
+                    double k = kernel[ky * kw + kx];
+                    sum += val * k;
+                }
+            }
+            out[y * out_w + x] = sum;
+        }
+    }
+
+    return out;
+}
+
+// Main edge detection logic using getPixel and condition on laplacian * noyau_center < 0
+void processEdgeDetection(const TiFF& input, TiFF& output, int a = 1) {
+    int width = input.getWidth();
+    int height = input.getHeight();
+
+    std::vector<double> noyaux, noyauy, noyau;
+    generateKernels(a, noyaux, noyauy, noyau);
+    int ksize = 2 * a + 1;
+
+    // Compute gradient and Laplacian using getPixel()
+    auto gradx = convolveValid(input, noyaux, ksize, ksize);
+    auto grady = convolveValid(input, noyauy, ksize, ksize);
+    auto lap   = convolveValid(input, noyau,  ksize, ksize);
+
+    int new_w = width - ksize + 1;
+    int new_h = height - ksize + 1;
+    output.create(new_w, new_h, 0.0);
+
+    double noyau_center = noyau[(ksize / 2) * ksize + (ksize / 2)];
+
+    for (int y = 0; y < new_h; ++y) {
+        for (int x = 0; x < new_w; ++x) {
+            int idx = y * new_w + x;
+            double gx = gradx[idx];
+            double gy = grady[idx];
+            double gmag = std::sqrt(gx * gx + gy * gy);
+            double lval = lap[idx];
+
+            double result = (lval * noyau_center < 0.0) ? gmag : 0.0;
+            output.setPixel(x, y, result);
+        }
+    }
+}
+
+#include "TiFF.hpp"
+#include <iostream>
+
+// Forward declaration
+void processEdgeDetection(const TiFF& input, TiFF& output, int a = 1);
+
+int main(int argc, char* argv[]) {
+    if (argc < 3) {
+        std::cerr << "Usage: " << argv[0] << " input.tiff output.tiff" << std::endl;
+        return 1;
+    }
+
+    TiFF inputImage;
+    if (!inputImage.load(argv[1])) {
+        return 1;
+    }
+
+    TiFF outputImage;
+    processEdgeDetection(inputImage, outputImage, 1);  // a = 1 → kernel size 3x3
+
+    outputImage.normalize();  // Optional: normalize to [0, 1] for visibility
+
+    if (!outputImage.save(argv[2])) {
+        return 1;
+    }
+
+    std::cout << "Edge detection complete. Output saved to " << argv[2] << std::endl;
+    return 0;
+}
+
+

@@ -1,0 +1,105 @@
+struct Circle {
+    uint32_t cx, cy, r;
+    double meanGray;
+};
+
+std::vector<Circle> TiFF::detectValidatedCirclesWithNDG(
+    uint32_t min_r, uint32_t max_r,
+    double max_stddev, double edge_ratio_threshold
+) const {
+    std::vector<Circle> detected;
+
+    for (uint32_t r = min_r; r <= max_r; ++r) {
+        for (uint32_t cy = r; cy < height - r; ++cy) {
+            for (uint32_t cx = r; cx < width - r; ++cx) {
+
+                // 1. Calcul des stats dans le disque
+                double sum = 0.0, sum_sq = 0.0;
+                uint32_t count = 0;
+                for (int dy = -int(r); dy <= int(r); ++dy) {
+                    for (int dx = -int(r); dx <= int(r); ++dx) {
+                        if (dx * dx + dy * dy <= r * r) {
+                            double val = getPixel(cx + dx, cy + dy);
+                            sum += val;
+                            sum_sq += val * val;
+                            ++count;
+                        }
+                    }
+                }
+
+                if (count < 10) continue;
+                double mean = sum / count;
+                double var = (sum_sq / count) - (mean * mean);
+                double stddev = std::sqrt(std::max(0.0, var));
+                if (stddev > max_stddev) continue;
+
+                // 2. Validation géométrique (gradient radial)
+                double grad_in = 0.0, grad_edge = 0.0;
+                uint32_t n_in = 0, n_edge = 0;
+                int r_in = std::max<int>(1, int(r) - 2);
+                int r_out = r + 2;
+
+                for (int dy = -r_out; dy <= r_out; ++dy) {
+                    for (int dx = -r_out; dx <= r_out; ++dx) {
+                        int x = cx + dx;
+                        int y = cy + dy;
+                        if (x <= 0 || y <= 0 || x >= int(width - 1) || y >= int(height - 1)) continue;
+
+                        double grad =
+                            std::abs(getPixel(x + 1, y) - getPixel(x - 1, y)) +
+                            std::abs(getPixel(x, y + 1) - getPixel(x, y - 1));
+
+                        int dist2 = dx * dx + dy * dy;
+                        if (dist2 <= r_in * r_in) {
+                            grad_in += grad;
+                            ++n_in;
+                        } else if (dist2 <= r_out * r_out) {
+                            grad_edge += grad;
+                            ++n_edge;
+                        }
+                    }
+                }
+
+                if (n_in == 0 || n_edge == 0) continue;
+
+                double avg_in = grad_in / n_in;
+                double avg_edge = grad_edge / n_edge;
+
+                if (avg_edge > edge_ratio_threshold * avg_in) {
+                    detected.push_back({cx, cy, r, mean});
+                }
+            }
+        }
+    }
+
+    return detected;
+}
+
+🧪 Exemple d’utilisation dans main
+
+int main() {
+    TiFF image;
+    if (!image.load("penetrametre.tif")) {
+        std::cerr << "Erreur de chargement." << std::endl;
+        return 1;
+    }
+
+    // Paramètres : rayon min/max, stddev max, ratio gradient bord/intérieur
+    std::vector<Circle> cercles = image.detectValidatedCirclesWithNDG(
+        10, 20,        // Rayon entre 10 et 20 pixels
+        0.02,          // Bruit faible autorisé
+        2.0            // Gradient bord au moins 2x plus fort
+    );
+
+    std::cout << "Cercles détectés : " << cercles.size() << "\n";
+
+    for (size_t i = 0; i < cercles.size(); ++i) {
+        const auto& c = cercles[i];
+        std::cout << "Cercle #" << i + 1
+                  << " : centre=(" << c.cx << "," << c.cy << ")"
+                  << ", rayon=" << c.r
+                  << ", NDG moyen=" << c.meanGray << "\n";
+    }
+
+    return 0;
+}
