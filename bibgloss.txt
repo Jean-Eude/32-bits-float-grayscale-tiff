@@ -1,0 +1,85 @@
+\documentclass[a4paper,12pt]{article}
+
+% Encodage, langue, liens
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{hyperref}
+
+% Bibliographie
+\usepackage[backend=biber,style=authoryear]{biblatex}
+\addbibresource{references.bib}
+
+% Glossaire
+\usepackage{glossaries}
+\makeglossaries
+
+% Chargement des entrées du glossaire depuis un fichier externe
+\input{glossaire.tex}
+
+% Métadonnées
+\title{Document avec Biblio et Glossaire externes}
+\author{Ton Nom}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduction}
+Ce document est rédigé en \gls{latex}, utilise un \gls{glossaire} externe et cite des sources via \gls{biber}~\cite{knuth1984texbook}.
+
+\section{Exemples de termes}
+On peut réutiliser les termes définis dans le glossaire : \gls{bibtex}, \gls{biber}, etc.
+
+\section{Conclusion}
+Grâce à \LaTeX{}, \gls{glossaire} et bibliographie sont facilement intégrables.
+
+\newpage
+\printglossaries
+
+\newpage
+\printbibliography
+
+\end{document}
+
+
+glossaire.tex:
+\newglossaryentry{latex}{
+    name=LaTeX,
+    description={Un système de composition de documents scientifiques basé sur TeX}
+}
+
+\newglossaryentry{glossaire}{
+    name=glossaire,
+    description={Une liste de termes techniques avec leurs définitions}
+}
+
+\newglossaryentry{biber}{
+    name=Biber,
+    description={Un moteur moderne utilisé avec BibLaTeX pour les bibliographies}
+}
+
+\newglossaryentry{bibtex}{
+    name=BibTeX,
+    description={Ancien gestionnaire de bibliographie utilisé avec LaTeX}
+}
+
+
+references.bib:
+
+@book{knuth1984texbook,
+  author    = {Donald E. Knuth},
+  title     = {The TeXbook},
+  year      = {1984},
+  publisher = {Addison-Wesley}
+}
+
+@book{lamport1994latex,
+  author    = {Leslie Lamport},
+  title     = {LaTeX: A Document Preparation System},
+  year      = {1994},
+  publisher = {Addison-Wesley}
+}
