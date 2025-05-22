@@ -37,11 +37,42 @@ Nous utilisons ici BibTeX avec Texmaker.
 Ordre exact de compilation :
 
 Dans Texmaker, clique dans cet ordre (ou utilise les raccourcis) :
-
     PDFLaTeX →  Compile le document (main.tex)
-
     BibTeX → Compile la bibliographie (references.bib)
-
     PDFLaTeX →
-
     PDFLaTeX → (encore une fois pour tout mettre à jour)
+    
+   \[
+\begin{array}{|l|}
+\hline
+\textbf{Nom du fichier :} \texttt{main.c} \\
+\textbf{Auteur :} Jean Dupont \\
+\textbf{Date :} 22 mai 2025 \\
+\textbf{Description :} Programme principal qui initialise les structures \\
+\hline
+\end{array}
+\]
+
+    ✅ Ce code affiche un encadré de type tableau centré, avec du texte bien aligné, simulant un "header" en haut de fichier source.
+
+✅ Variante plus simple sans encadrement
+
+\[
+\begin{aligned}
+\textbf{Fichier} & : \texttt{main.cpp} \\
+\textbf{Auteur} & : Alice Martin \\
+\textbf{But}    & : Implémentation de l’algorithme de tri rapide
+\end{aligned}
+\]
+
+✅ Variante avec \boxed autour de tout
+
+\[
+\boxed{
+  \begin{array}{ll}
+    \textbf{Fichier} & : \texttt{calculatrice.py} \\
+    \textbf{Auteur}  & : Pierre Lefèvre \\
+    \textbf{Objet}   & : Script Python pour des calculs simples
+  \end{array}
+}
+\]
