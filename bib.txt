@@ -1,0 +1,47 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{hyperref}
+
+\title{Exemple avec bibliographie classique (BibTeX)}
+\author{Ton Nom}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+Voici une citation de Knuth~\cite{knuth1984texbook}.
+
+\section{Conclusion}
+Nous utilisons ici BibTeX avec Texmaker.
+
+% Bibliographie classique
+\bibliographystyle{plain}  % ou alpha, abbrv, unsrt, etc.
+\bibliography{references}  % nom du fichier .bib (sans extension)
+
+\end{document}
+
+
+ 2. references.bib – Bibliographie
+
+@book{knuth1984texbook,
+  author    = {Donald E. Knuth},
+  title     = {The TeXbook},
+  year      = {1984},
+  publisher = {Addison-Wesley}
+}
+
+
+Ordre exact de compilation :
+
+Dans Texmaker, clique dans cet ordre (ou utilise les raccourcis) :
+
+    PDFLaTeX →  Compile le document (main.tex)
+
+    BibTeX → Compile la bibliographie (references.bib)
+
+    PDFLaTeX →
+
+    PDFLaTeX → (encore une fois pour tout mettre à jour)
