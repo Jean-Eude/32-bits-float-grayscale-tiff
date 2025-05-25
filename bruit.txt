@@ -1,0 +1,153 @@
+\textbf{Les différents bruits :}
+
+\textbf{bruit numérique} : on appelle bruit numérique toute fluctuation parasite ou dégradation que subit l'image de l'instant de son acquisition jusqu'à son enregistrement. Le bruit numérique est une notion générale à tout type d'image numérique, et ce quel que soit le type du capteur à l'origine de son acquisition (appareil photo numérique, scanner, caméra thermique, etc.). Les sources de bruit numérique sont multiples, certaines sont physiques liées à la qualité de l’éclairage, de la scène, la température du capteur[1], la stabilité du capteur de l'image durant l'acquisition, d'autres apparaissent durant la numérisation de l'information[2]. Un bruit est par nature aléatoire, un bruit ne se retire pas, on peut dire que : \[
+\begin{aligned}
+\text{bruit} + \text{bruit} &= \text{plus de bruit} \\
+\text{bruit} - \text{bruit} &= \text{plus de bruit}
+\end{aligned}
+\]
+\textbf{bruit photonique} qui est un bruit temporel, aussi apellé bruit de grenaille, bruit poivre et sel ou bruit quantique. C'est une propriété quantique de la lumière indépendante de la qualité du capteur. Si une source lumineuse émet un flux constant de photons, les photons qui arrivent à un endroit donné ont en moyenne un flux constant, mais sur des intervalles de temps plus courts, le flux varie. Il est d’autant plus visible que le flux qui arrive sur le capteur est faible et qu’on doive amplifier l’image pour voir le signal utile : le bruit est amplifié d’autant et brouille l’image.Ce bruit est proportionnel au carré du signal reçu. Autrement dit, quand le signal est multiplié par 4, le bruit est multiplié par 2, ainsi le Rapport Signal sur Bruit (RSB) d’une photo de 60 s sera 2 fois meilleur que le RSB d’une pose de 15 s. Augmenter le temps de pose unitaire et empiler des images sont les remèdes pour combattre ce bruit.
+\textbf{bruit et signal thermique} : l s’agit d’une combinaison de bruit spatial, temporel et d’un signal. Le bruit-signal thermique est aussi appelé bruit de Johnson ou de Johnson-Nyquist. Il est généré par l’agitation thermique des électrons à l’intérieur du capteur. La chaleur agite les électrons qui vont parfois avoir assez d’énergie pour être considérés comme un signal. Plus le temps de pose est long et la température est élevée, plus le nombre d’électrons qui vont ainsi s’échapper sera important. Des irrégularités d’une zone du capteur à l’autre vont générer un bruit spatial, qui est responsable du bruit de trame que l’on observe quand on ne fait pas de dithering. La nature même de ce phénomène fait qu’on a un niveau moyen qui s’accumule avec le temps de pose, d’autant plus vite que la température augmente. C’est le signal thermique. Et on constate une fluctuation aléatoire autour de cette valeur moyenne, c’est le bruit temporel thermique.
+
+\textbf{bruit de dérive} : C’est la conséquence du bruit spatial thermique responsable d’une trame inclinée très gênante après empilement car elle ne peut pas être supprimée sans dégrader l’image. La trame suit la dérive causée par une mise en station imprécise, d’où son nom. Elle porte aussi le nom (incorrect) de bruit télégraphique, ou walking noise chez les anglosaxons. La seule façon de lutter contre ce phénomène est soit de faire une mise en station parfaite, ce qui n’est pas facile en configuration nomade, soit de faire du dithering, ou mieux, les deux.
+On élimine le bruit de trame en combinant une bonne mise en station et la technique de dithering.
+
+\textbf{bruit de scintillation} : C’est un bruit temporel et spatial. Il est aussi appelé bruit de scintillement, de papillonnement ou 1/f (en anglais flicker noise).Il est principalement causé par des impuretés ou défauts présents dans le matériau semi-conducteur du capteur qui capturent ou libèrent aléatoirement des électrons dans le système. Les semi-conducteurs de petite surface (par exemple les tous petits pixels) sont plus sensibles à ce bruit que les plus gros. C’est un bruit aléatoire mais lié à la présence d’impuretés dans le capteur. On peut donc cartographier les zones où il est plus ou moins présent. Il est aussi légèrement affecté par la température. On corrige le bruit de scintillation en intégrant un grand nombre de poses, et dans une moindre mesure, avec les darks.
+
+\textbf{bruit de lecture} : C’est un bruit temporel. En anglais on l’appelle readout noise. Il a la même origine quantique que le bruit photonique, mais au lieu des photons, il s’agit ici des électrons. Il est totalement aléatoire et affecte toutes les photos, quel que soit le temps de pose, la température ou l’illumination du capteur. Cependant il est relativement faible, et est de mieux en mieux géré par les fondeurs de capteurs, à tel point qu’il devient presque négligeable pour les capteurs les plus récents. Ce bruit est de l’ordre de quelques électrons par photosite, voir moins de 1 électron (en moyenne) sur les meilleurs capteurs. On corrige le bruit de lecture en empilant de nombreuses poses. Les offsets (ou bias chez les anglosaxons) ne retirent pas le bruit de lecture !
+
+\textbf{bruit de bande} : C’est un bruit temporel. Il est aussi appelé banding en anglais. C’est un bruit aléatoire qui affecte toute une colonne (ou toute une rangée) de pixels. Cela est dû à la façon dont les fabricants de capteurs gèrent le signal issu des colonnes (ou rangées) de pixels. Un ensemble de pixels au bout de la colonne (ou de la rangée) est recouvert d’un revêtement opaque et ils servent de référence afin de corriger – au moins partiellement – le bruit thermique de cette colonne (ou rangée). Mais la réponse de deux colonnes (ou rangées) voisines n’est jamais identique à cause en particulier des parts aléatoires des bruits (thermique, lecture et scintillation) qui affectent aussi ces pixels aveugles. Ainsi la correction fluctue aléatoirement d’une colonne (ou rangée) à l’autre et d’une photo à l’autre. C’est moins visible chez Nikon et Sony que chez Canon.
+
+\textbf{bruit de quantification} : Ce bruit est d’une autre nature que les autres. Il n’est ni temporel ni spatial. Il dépend de l’image prise et de la façon dont elle est numérisée. Le flux d’électrons émis par le photosite doit être converti en une valeur numérique qui est souvent codée avec moins de chiffres que le nombre réel d’électrons reçus. Il s’opère une sorte d’arrondi. C’est un peu comme payer ses courses avec uniquement des pièces de 1€ alors que les prix sont donnés en centimes. Cette dégradation du signal est le bruit de quantification. Elle se traduit par des dégradés échelonnés et l’apparition de grain sur les images. On corrige ce bruit avec un gain adapté pour gagner en dynamique et en empilant des poses afin de moyenner les erreurs d’arrondi. Le dithering permet aussi d’en réduire les conséquences.
+
+\textbf{Luminescence} : Ce terme est souvent aussi appelé Ampglow. Il regroupe deux phénomènes expliqués ci-dessous.
+Thermoluminescence:
+Il s’agit d’un signal causé par l’échauffement de certains composant électroniques à proximité du capteur. Elle se traduit par des zones où un signal parasite, causé par la réponse thermique du capteur, sera plus important à certains endroits, ici en bas à droite. La thermoluminescence n’est pas forcément proportionnelle au temps de pose car certains composant qui chauffent ne sont pas toujours en marche. L’optimisation des darks peut alors mal fonctionner et retourner des images mal corrigées. Il est dans ce cas préférable de ne pas optimiser les darks. On corrige la thermoluminescence avec les darks non optimisés.
+
+Luminescence infrarouge:
+Il s’agit d’un signal causé par l’émission en proche infrarouge de certains composants de la caméra. Elle est surtout visible sur les caméras refroidies, pour lesquelles la thermoluminescence, le signal et le bruit thermique sont très faibles. Des structures très marquées apparaissent alors sur les bords ou les angles. Comme avec la thermoluminescence, ce phénomène est mal corrigé avec les darks optimisés. On corrige la luminescence IR avec les darks non optimisés
+
+\textbf{D'autres images à disposition pour les prétraitements} :
+
+Image de light : image précédente
+
+Image de noire : Le Noir (Dark) sert à capter le bruit de l’électronique (bruit thermique) de la caméra CCD. Il doit être réalisé avec le même temps de pose que l’objet à imager et à la même température. Il est à noter que le Noir contient le Bias (comme toutes les images acquisent, car c’est le bruit de lecture de la caméra). Le Noir se prend en obstruant le foyer de la caméra CCD et en effectuant un temps d’exposition identique à chaque image composite de l’objet à imager. Aussi, le Noir doit être pris à la même température que l’objet à imager, pour que les pixels chauds et froids soient identiques. Il peut être pris avant la séance d’astronomie ou après. Prendre au moins 10 images Noires pour en réaliser plus tard un Maître Noir en utilisant la méthode de compositage Sigma-clip. Celle-ci permettra de faire disparaître les rayons cosmiques qui peuvent s’introduire dans quelques images Noires ainsi que d’autres parasites, surtout lorsque l’on prend les images Noires immédiatement après la session d’imagerie. Les points blancs représentent des pixels chauds (Hot pixels ou Bad pixels) qui apparaissent toujours au même endroit sur l’image pour chaque photo composite. Ces pixels chauds représentent une partie du bruit thermique de l’image.
+
+Les problèmes surgissent car il y a une autre source d'électrons dans le capteur que les photons incident à savoir une génération thermique d'électrons. Ce signal thermique augmente avec le temps. On a donc après l'acquisition d'une image pour chaque pixel (X,Y) un nombre d'électrons Nbrut qui vaut: 
+\[
+\textit{Nbruit}(X, Y) = \textit{Nphoton}(X, Y) + \textit{Nthermique}(X, Y)
+\]
+L'image étant numérisée, on peut faire des calculs pour retrouver le nombre de photons incident (ce qui nous intéresse). On se dit qu'il "suffit" de retrancher Nthermique à Nbrut pour retrouver notre information. Pour déterminer Nthermique il faut donc faire une deuxième image dans les mêmes conditions que la première sans ouvrir l'obturateur pour que Nphoton soit nulle. Cette image que l'on nomme "Noir" ou "Dark" contient un nombre d'électrons qui n'est malheureusement pas rigoureusement identique à Nthermique à cause du bruit présent dans le système. Par ailleurs Nthermique n'est pas constant en fonction des coordonnées X,Y des pixels. Lorsque l'on soustrait Nthermique on va supprimer les inhomogénéités pixel à pixel mais il va rester du bruit. Le bruit à plusieurs origines. Pour Nphotons il provient du fait que les photons arrivent au hasard sur le capteur avec en moyenne un flux donné qui est celui de l'étoile observé. Donc pour deux poses de durées identiques, le nombre de photons incidents n'est pas identique mais fluctue en suivant une statistique de Poisson. Cette statistique a un écart type σ qui est égal à la racine carrée de la valeur moyenne (signal) : 
+\[
+\sigma = B = \sqrt{S}
+\]
+avec S le signal intéressant et B le bruit. Lorsque l'on a plusieurs sources de bruit B1, B2 le bruit s'ajoute de façon quadratique c'est a dire que l'on a 
+\[
+B^2 = B_1^2 + B_2^2
+\]
+Le signal thermique peut s'écrire en fonction du temps de pose t et de la température T au moyen d'une équation du type 
+\[
+N_{\text{thermique}} = N(X, Y) \cdot 2^{\left( \frac{T - T_0}{\Delta T} \right)} \cdot t
+\] ou ΔT est l'écart en température pour obtenir un doublement du courant noir et To est la température ambiante. N(X, Y) représente le nombre d'électrons générés par seconde dans le pixel X, Y à la température ambiante. Si on reprend l'équation (1) correspondant à l'image non traitée le bruit dans cette image est :
+
+\[
+B = \sqrt{N_{\text{photon}} + N(X, Y) \cdot 2^{\left( \frac{T - T_0}{\Delta T} \right)} \cdot t}
+\]
+Si on fait la moyenne d'une dizaine de "dark" le bruit dans l'image n'augmente plus que de 10% par rapport à l'image originale, on a pas perdu grand chose au niveau bruit et on a fortement amélioré l'image. Le seul inconvénient de cette méthode c'est la nécessité de faire une dizaine de darks alors que l'on pourrait utiliser le temps utile pour faire des observations. Pour éviter cette perte de temps il faut posséder une camera stabilisée en température et toujours travailler à la même température lors des prises d'images. On réalise alors ce que l'on appel un "noir maître" qui nous servira à traiter l'image. noir maitre = combinaison de plsueirus noirs par médiane ou moyenne
+
+
+T flat field: La plage de lumière uniforme (PLU ou flat field) permet de corriger les problèmes de vignetage de l’optique utilisé (la lumière a tendance à diminuer d’intensité au fur et à mesure que l’on s’éloigne du centre de l’image) et de faire disparaître les poussières qui se déposent à différents endroits sur l’optique et le capteur de la caméra. Il est à noter qu’on peut essayer d’enlever toutes ces poussières, mais il en restera toujours. Aussi le PLU permet de corriger les variations de sensibilité des pixels de la caméra.  Le flat field dont on n’a pas encore parlé sert à corriger les non uniformités de l'image associées au vignettage et à la différence de sensibilité des pixels.
+\section*{Correction par le Flat Field}
+
+Le \textbf{flat field}, dont on n’a pas encore parlé, sert à corriger les non-uniformités de l’image associées au vignettage et aux différences de sensibilité des pixels.
+
+\[
+N_{\text{mes}}(x, y) = K(x, y) \cdot N_{\text{image}}(x, y)
+\]
+
+où $K(x, y)$ est un coefficient proche de 1 représentant l’ensemble des non-uniformités.
+
+\subsection*{Détermination de $K(x, y)$}
+
+Pour déterminer $K(x, y)$, il faut disposer d’une image uniforme, telle que :
+
+\[
+N_{\text{image}}(x, y) = C
+\]
+
+On en déduit :
+
+\[
+K(x, y) = \frac{N_{\text{mes}}(x, y)}{N_{\text{image}}(x, y)} = \frac{N_{\text{mes}}(x, y)}{C}
+\]
+
+Deux problèmes se posent alors :
+1. Réaliser une image constante (uniforme)
+2. Gérer le bruit induit par ce traitement
+
+\subsection*{Considérations sur le bruit}
+
+Le bruit de $K(x, y)$ s'obtient à partir de l’équation (13) avec une attention particulière pour la partie thermique. En effet, avec des poses courtes et un CCD bien refroidi, ce terme est négligeable. On a donc :
+
+\[
+N_{\text{flat}} = N_{\text{brut}} - N_{\text{thermique}} \approx N_{\text{brut}} - N_{\text{offset}}
+\]
+
+En moyennant $n$ images brutes, on obtient le flat maître :
+
+\[
+N_{\text{flat}} = \frac{1}{n} \sum_{i=1}^{n} (N_{\text{brut},i} - N_{\text{offset}})
+\]
+
+\[
+K(x, y) = \frac{1}{nK} \sum_{i=1}^{n} (N_{\text{brut},i} - N_{\text{offset}})
+\]
+
+où $K$ est une constante représentant la dynamique du flat.
+
+\subsection*{Bruit du flat maître}
+
+\[
+B_{\text{flat}} = \sqrt{ \frac{N_{\text{flat}} + N^2_{\text{num}} \left(1 + \frac{1}{p} \right)}{n} }
+\]
+
+\subsection*{Traitement global de l’image}
+
+\[
+N_{\text{brut}} = K(x, y) \cdot N_{\text{photons}} + N_{\text{offset}} + N_{\text{thermique}}
+\]
+
+\[
+N_{\text{photons}} = \frac{N_{\text{brut}} - N_{\text{offset}} - N_{\text{thermique}}}{K(x, y)}
+\]
+
+\[
+B = \sqrt{
+    N_{\text{photons}} + N_{\text{ciel}} + N^2_{\text{num}} \left(1 + \frac{1}{p} \right)
+    + N^1_{\text{thermique}} \left(1 + \frac{1}{p} \right)
+    + \frac{B_{\text{flat}}^2}{K^2}
+}
+\]
+
+\subsection*{Remarques}
+
+- Si la dynamique de l’image est grande (grand $K$) et que le nombre d’images moyennées est important, le bruit induit par le flat field est faible.
+- Il est essentiel d’avoir une image constante de haute qualité pour ne pas introduire de gradients de luminance.
+
+\subsection*{Méthodes pour obtenir une image constante}
+
+1. Réaliser une image du fond de ciel au crépuscule ou à l’aube avec l’instrument.
+2. Utiliser une \textbf{boîte à flat}, un plan de lumière uniforme positionné à l’entrée du télescope.
+
+
+
+J flat field aussi :
+
+
+
+\textbf{Détails des prétraitements et de qui a été fait avant} :
+
+
+
+
+
