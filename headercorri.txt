@@ -1,0 +1,101 @@
+\documentclass[12pt,a4paper]{report}
+
+% --- Encodage et langues ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+
+% --- Marges et mise en page ---
+\usepackage{geometry}
+\geometry{left=2.0cm, right=2.0cm, top=2.0cm, bottom=2.0cm}
+\onehalfspacing
+
+% --- Packages utiles ---
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{lmodern} % police vectorielle moderne
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage{xurl}
+\usepackage{titling}
+\usepackage{mathpazo} % police Palatino
+\usepackage{ragged2e}
+\usepackage{titlesec}
+\usepackage{hyperref}
+
+% --- Mise en page des en-têtes et pieds de page ---
+\pagestyle{fancy}
+\fancyhf{} % Réinitialise tout
+
+% Affichage du titre du chapitre dans l'en-tête
+\renewcommand{\chaptermark}[1]{%
+  \markboth{CHAPITRE \thechapter. \ #1}{}%
+}
+\fancyhead[L]{\nouppercase{\leftmark}} % Titre du chapitre
+\fancyfoot[L]{Evan Combot}
+\fancyfoot[C]{\thepage}
+\fancyfoot[R]{Université de Montpellier}
+
+% Appliquer aussi aux pages de style "plain"
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyhead[L]{\nouppercase{\leftmark}}
+  \fancyfoot[L]{Evan COMBOT}
+  \fancyfoot[C]{\thepage}
+  \fancyfoot[R]{Université de Montpellier}
+}
+
+% --- Profondeur de numérotation ---
+\setcounter{secnumdepth}{6}
+
+% --- Format des titres ---
+
+% Chapitre
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries}
+  {\chaptername\ \thechapter}{20pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{-20pt}{30pt}
+
+% Section
+\titleformat{\section}
+  {\normalfont\LARGE\bfseries}
+  {\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{18pt}{10pt}
+
+% Sous-section
+\titleformat{\subsection}
+  {\normalfont\Large\bfseries}
+  {\thesubsection}{1em}{}
+\titlespacing*{\subsection}{0pt}{14pt}{8pt}
+
+% Sous-sous-section
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries}
+  {\thesubsubsection}{1em}{}
+\titlespacing*{\subsubsection}{0pt}{12pt}{6pt}
+
+% Paragraphe
+\titleformat{\paragraph}
+  {\normalfont\normalsize\bfseries}
+  {\theparagraph}{1em}{}
+\titlespacing*{\paragraph}{0pt}{10pt}{4pt}
+
+% Sous-paragraphe
+\titleformat{\subparagraph}
+  {\normalfont\normalsize\bfseries\itshape}
+  {\thesubparagraph}{1em}{}
+\titlespacing*{\subparagraph}{0pt}{8pt}{2pt}
+
+
+% Profondeur de numérotation (affichage du numéro dans le texte)
+\setcounter{secnumdepth}{6}
+
+% Profondeur de la table des matières (affichage dans la TOC)
+\setcounter{tocdepth}{5}
+
+
