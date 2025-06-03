@@ -1,0 +1,184 @@
+\underset{\text{16 bits}}{\text{PNG}} \longrightarrow \underset{\text{8 bits}}{\text{TIFF}}
+
+\underset{\text{16 bits}}{\text{PNG}} 
+\xrightarrow{\text{conversion}} 
+\underset{\text{8 bits}}{\text{TIFF}} 
+\xrightarrow{\text{conversion}} 
+\underset{\text{8 bits}}{\text{JPEG}}
+
+
+\[
+\underset{\text{16 bits}}{\text{PNG}} 
+\xrightarrow{\text{conversion}} 
+\underset{\text{32 bits (flottant)}}{\text{TIFF}} 
+\xrightarrow{\text{conversion}} 
+\underset{\text{64 bits (double)}}{\text{JPEG}}
+\]
+
+
+
+Chapitre 1 – Normalisation des Intensités
+Objectif :
+Préparer l’image à l’analyse en réduisant l’influence des valeurs extrêmes (pixels très sombres ou saturés) qui peuvent fausser les traitements statistiques.
+
+Description :
+L’image est d’abord normalisée selon une méthode robuste : les intensités sont réajustées pour que la valeur au 5e percentile devienne 0 et celle au 95e percentile devienne 1.
+Cela signifie que les 5 % des pixels les plus sombres sont tous ramenés à 0, et les 5 % les plus brillants à 1.
+
+Fonction utilisée :
+image_normalisee.normalizePercentile(0.05, 0.95);
+
+Cela permet :
+
+    D’éliminer l’effet des artefacts très lumineux
+
+    De travailler dans une échelle commune et stable
+
+    D’améliorer la précision des détections locales
+
+Chapitre 2 – Détection Locale d’Anomalies (Z-Score sur Image Normalisée)
+Objectif :
+Détecter les points brillants anormaux (spikes) qui ressortent fortement de leur voisinage.
+
+Méthode :
+Pour chaque pixel de l’image normalisée, on analyse une fenêtre locale (généralement 5×5 pixels) centrée autour de lui :
+
+    On calcule la moyenne et l’écart-type des pixels voisins (sans inclure le pixel central).
+
+    Si le pixel central dépasse significativement cette moyenne (au-delà d’un seuil dynamique k), on le considère comme un artefact.
+
+Le seuil k est estimé automatiquement selon la dispersion globale de l’image, typiquement entre 0.7 et 1.25.
+
+Fonctions utilisées :
+double k = estimateK(image_normalisee);
+detectZScoreSpikes(image_normalisee, mask_norm, k);
+
+Un masque binaire est généré où les pixels anormaux sont marqués avec la valeur 1.
+
+Chapitre 3 – Détection sur l’Image Brute
+Objectif :
+Repérer les artefacts qui ne sont pas visibles après normalisation, notamment les valeurs extrêmes absolues comme les saturations.
+
+Description :
+On applique la même méthode de Z-score, mais cette fois directement sur l’image originale (non normalisée). Cela permet de conserver une analyse en valeur absolue.
+
+Fonctions utilisées :
+k = estimateK(image);
+detectZScoreSpikes(image, mask_spikes_raw, k);
+
+Pourquoi cette double analyse ?
+
+    L’image normalisée permet de détecter les anomalies relatives (locales).
+
+    L’image brute permet de détecter les anomalies absolues (globales, saturations).
+
+On génère ainsi un second masque binaire complémentaire.
+
+Chapitre 4 – Fusion des Masques
+Objectif :
+Combiner les différentes détections pour créer un masque global des pixels à corriger.
+
+Description :
+On fusionne :
+
+    Le masque des anomalies normalisées
+
+    Le masque des anomalies brutes
+
+    (Éventuellement) un masque basé sur le gradient (bords brillants)
+
+Pour chaque pixel, on prend la valeur maximale des trois masques. Si au moins une méthode détecte un défaut, ce pixel est marqué comme corrompu.
+
+Code utilisé :
+double m = std::max({mask_norm.getPixel(x, y), mask_spikes_raw.getPixel(x, y), mask_grad_morpho.getPixel(x, y)});
+mask_fusion.setPixel(x, y, m);
+
+Résultat :
+Un masque final mask_fusion indiquant toutes les zones problématiques de l’image.
+
+Chapitre 5 – Correction Robuste par Interpolation
+Objectif :
+Remplacer les pixels corrompus par des estimations fiables à partir de leurs voisins non corrompus, tout en préservant les détails et la cohérence locale.
+
+Description :
+Pour chaque pixel à corriger :
+
+    On sélectionne une grande fenêtre autour (typiquement 11×11).
+
+    On ignore les pixels eux-mêmes corrompus dans le masque.
+
+    Pour les autres, on calcule une moyenne pondérée :
+
+        Les pixels proches comptent plus que les lointains.
+
+        Le poids est déterminé par une fonction gaussienne :
+        w = exp(-distance² / 2σ²)
+
+Si aucun voisin sain n’est trouvé, on utilise une moyenne brute comme solution de secours.
+
+Chaque pixel corrigé est aussi marqué dans une carte de modifications, ce qui permet d’évaluer la portée des changements.
+
+Fonction utilisée :
+corrigerImageRobuste(image_normalisee, mask_fusion, image_corrigee, 11, &carte_modifs);
+
+Chapitre 6 – Résultat et Évaluation
+Après la correction, on peut :
+
+    Visualiser l’image corrigée et la carte des modifications
+
+    Comparer avec l’image d’origine via des métriques :
+
+        PSNR (Peak Signal-to-Noise Ratio) : mesure quantitative de la fidélité
+
+        SSIM (Structural Similarity Index) : mesure perceptuelle de la qualité
+
+Ces mesures permettent de valider objectivement la qualité de la correction.
+
+Conclusion
+Ce pipeline suit une démarche robuste et progressive :
+
+    Prétraitement fiable par normalisation
+
+    Détections locales et globales des défauts
+
+    Fusion intelligente des résultats
+
+    Interpolation douce et localisée
+
+Il est particulièrement adapté au traitement d’images scientifiques ou à haute dynamique, où les artefacts lumineux et saturés sont fréquents.
+
+
+
+
+🔍 Détails des types de relations représentées :
+
+    Héritage (Traitements → Parser)
+
+        Représenté par une flèche vide (◁)
+
+        Traitements hérite de Parser, donc il récupère ses attributs/méthodes
+
+    Dépendance / Utilisation (Traitements -- TiFF, Traitements -- Filesystem)
+
+        Représenté par une flèche en pointillé (---▷)
+
+        Traitements utilise les méthodes ou types déclarés dans ces classes, sans en être propriétaire
+
+📘 Rappel des types de relations possibles en UML :
+Type de relation	Symbole	Description
+Association	—	Lien logique entre deux classes (ex. une classe a une autre en attribut)
+Agrégation	◇—	Relation “a un”, mais sans possession stricte (ex. collection)
+Composition	◆—	Lien fort, cycle de vie dépendant (ex. partie-tout)
+Héritage	◁	Classe fille hérite d’une classe mère
+Réalisation (interface)	◁╌	Implémentation d’une interface
+Dépendance	--▷ (pointillée)	Utilisation temporaire d’une classe (paramètre, appel)
+
+
+
+
+
+
+
+
+
+
