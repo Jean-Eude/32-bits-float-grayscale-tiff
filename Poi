@@ -1,0 +1,85 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\title{Détection Locale d'Anomalies par Score Z}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Objectif}
+
+L’algorithme cherche à détecter automatiquement les \textbf{points brillants anormaux} (aussi appelés \textit{spikes}), qui apparaissent comme des artefacts ponctuels très lumineux par rapport à leur voisinage immédiat. Ces anomalies sont fréquentes dans les images issues de capteurs scientifiques comme les CCD ou CMOS, en raison du bruit thermique, de la radioactivité, ou d'autres phénomènes aléatoires.
+
+\section*{Modèle Statistique : Loi de Poisson et Distribution Locale}
+
+Dans un capteur photonique, les valeurs d’intensité des pixels peuvent être modélisées par une \textbf{loi de Poisson} :
+
+\[
+I(x, y) \sim \mathcal{P}(\lambda)
+\]
+
+où \lambda représente l'intensité moyenne locale. Cette hypothèse est pertinente car les photons arrivent aléatoirement, et leur comptage suit cette loi. Néanmoins, comme l’image est déjà convertie en niveaux réels (flottants), on ne traite pas explicitement la Poisson, mais on \textbf{approxime localement la distribution par une loi normale} via le théorème central limite.
+
+\section*{Calcul Local (dans \texttt{detectZScoreSpikes})}
+
+Pour chaque pixel I_c (le pixel central), une \textbf{fenêtre carrée} (généralement 5×5) est définie autour :
+
+\begin{enumerate}
+    \item On \textbf{exclut le pixel central} du calcul.
+    \item On calcule la \textbf{moyenne locale} \mu et l' \textbf{écart-type} \sigma sur les voisins immédiats.
+    \item Si le pixel central dépasse le seuil \mu + k \cdot \sigma, il est considéré comme un artefact.
+\end{enumerate}
+
+Cela se traduit par le code suivant :
+
+\begin{verbatim}
+if (center > mean + k * stddev)
+    outputMask.setPixel(x, y, 1.0);
+\end{verbatim}
+
+Un masque binaire est ainsi construit, où chaque pixel détecté comme outlier est marqué avec la valeur 1.0.
+
+\section*{Estimation du Seuil Dynamique k (\texttt{estimateK})}
+
+Au lieu d’imposer un seuil fixe, la fonction \texttt{estimateK} ajuste dynamiquement le seuil selon la \textbf{dispersion globale de l’image} :
+
+\begin{enumerate}
+    \item L’image est d’abord triée (vector \texttt{pixels}).
+    \item On exclut les 10\% des pixels les plus brillants (pour éviter les saturations).
+    \item On calcule la \textbf{moyenne et l’écart-type robustes}.
+    \item Le seuil est donné par :
+\end{enumerate}
+
+\[
+k = \text{clamp}(1.0 + 0.2 \cdot \sigma, \; 0.7, \; 1.25)
+\]
+
+Cela permet :
+\begin{itemize}
+    \item D’être plus strict sur les images peu bruitées.
+    \item D’être plus tolérant sur les images bruitées.
+    \item D’adapter dynamiquement la détection au contenu de chaque image.
+\end{itemize}
+
+\section*{Exemple : dans votre fonction \texttt{main()}}
+\begin{verbatim}
+double k_norm = estimateK(image_normalisee);
+detectZScoreSpikes(image_normalisee, mask_norm, k_norm, 5);
+\end{verbatim}
+
+Ce passage applique la détection de spikes \textbf{sur l’image normalisée}, en adaptant automatiquement le seuil de détection à l’image traitée.
+
+\section*{Avantages}
+
+\begin{itemize}
+    \item \textbf{Robuste aux gradients d’intensité} (car tout est local).
+    \item \textbf{Insensible à la dynamique absolue} (grâce à la normalisation et estimation locale).
+    \item \textbf{Flexible} selon la nature du bruit.
+\end{itemize}
+
+\end{document}
