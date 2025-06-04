@@ -1,0 +1,14 @@
+\begin{tabular}{@{}>{\bfseries}p{5cm} p{8.5cm}@{}}
+\toprule
+Champ technique           & Valeur \\
+\midrule
+Format du fichier         & \texttt{TIFF} (Tagged Image File Format) \\
+Taille de l'en-tête       & \texttt{512} octets \\
+Dimensions de l’image     & \texttt{1024 × 768} pixels \\
+Profondeur par pixel      & \texttt{64 bits} (\texttt{float64}) \\
+Compression               & Aucune \\
+Ordre des octets (endianness) & \texttt{Little endian} \\
+Date de création          & \texttt{2025-06-04} \\
+Généré par                & \texttt{tifffile 2025.1} \\
+\bottomrule
+\end{tabular}
