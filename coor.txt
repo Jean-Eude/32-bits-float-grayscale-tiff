@@ -1,0 +1,440 @@
+// Correction du profil
+import sys
+import matplotlib
+matplotlib.use('Qt5Agg')  # Facultatif, utile pour affichage interactif local
+
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import tifffile
+
+def load_image(filepath):
+    """Charge une image TIFF 64 bits (float64 compatible)."""
+    try:
+        image = tifffile.imread(filepath)
+        return np.squeeze(image)  # Supprime les dimensions inutiles (ex : (1, H, W) → (H, W))
+    except Exception as e:
+        print(f"Erreur lors du chargement de l'image : {e}")
+        sys.exit(1)
+
+# Vérification des arguments
+if len(sys.argv) != 2:
+    print("Usage : python3 viewImage.py <image.tiff>")
+    sys.exit(1)
+
+filepath = sys.argv[1]
+
+# Vérifie si le fichier existe
+if not os.path.exists(filepath):
+    print(f"Fichier introuvable : {filepath}")
+    sys.exit(1)
+
+# Chargement de l'image
+img = load_image(filepath)
+
+# Vérification des dimensions
+if img.ndim != 2:
+    print(f"L'image doit être 2D après suppression des dimensions inutiles, mais elle est de forme {img.shape}")
+    sys.exit(1)
+
+# Affichage des informations de l’image
+print(f"Dtype : {img.dtype}, shape : {img.shape}, ndim : {img.ndim}")
+
+# Affichage avec imshow
+filename = os.path.basename(filepath)
+fig, ax = plt.subplots(figsize=(10, 8))
+im = ax.imshow(img, cmap='gray', aspect='auto')
+cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+cbar.set_label("Intensité des pixels", fontsize=12)
+
+# Titre avec nom du fichier
+ax.set_title(f"Aperçu : {filename}", fontsize=16, pad=12)
+ax.axis("off")
+
+fig.tight_layout()
+fig.savefig("image_affichee.png", dpi=300)
+plt.show()
+
+
+
+
+
+
+// PSNR et SSIM (1)
+import sys
+import os
+import numpy as np
+import tifffile
+
+def load_image(filepath):
+    """Charge une image TIFF et supprime les dimensions inutiles."""
+    try:
+        img = tifffile.imread(filepath)
+        return np.squeeze(img)
+    except Exception as e:
+        print(f"Erreur lors du chargement de {filepath} : {e}")
+        sys.exit(1)
+
+def compute_psnr(img1, img2):
+    """Calcule le PSNR entre deux images."""
+    mse = np.mean((img1 - img2) ** 2)
+    if mse == 0:
+        return float('inf')
+    PIXEL_MAX = np.max(img1)
+    return 20 * np.log10(PIXEL_MAX / np.sqrt(mse))
+
+def mean_filter(img, kernel_size=7):
+    """Filtre de moyennage simple avec padding (sans scipy)."""
+    pad = kernel_size // 2
+    padded = np.pad(img, pad_width=pad, mode='reflect')
+    out = np.zeros_like(img)
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            region = padded[i:i+kernel_size, j:j+kernel_size]
+            out[i, j] = np.mean(region)
+    return out
+
+def compute_ssim(img1, img2, C1=6.5025, C2=58.5225):
+    """Calcule une version simplifiée du SSIM sans dépendances externes."""
+    img1 = img1.astype(np.float64)
+    img2 = img2.astype(np.float64)
+
+    mu1 = mean_filter(img1)
+    mu2 = mean_filter(img2)
+
+    mu1_sq = mu1 * mu1
+    mu2_sq = mu2 * mu2
+    mu1_mu2 = mu1 * mu2
+
+    sigma1_sq = mean_filter(img1 * img1) - mu1_sq
+    sigma2_sq = mean_filter(img2 * img2) - mu2_sq
+    sigma12 = mean_filter(img1 * img2) - mu1_mu2
+
+    numerator = (2 * mu1_mu2 + C1) * (2 * sigma12 + C2)
+    denominator = (mu1_sq + mu2_sq + C1) * (sigma1_sq + sigma2_sq + C2)
+    ssim_map = numerator / denominator
+    return np.mean(ssim_map)
+
+# === Main ===
+if len(sys.argv) != 3:
+    print("Usage : python3 compare_images.py <image1.tiff> <image2.tiff>")
+    sys.exit(1)
+
+path1, path2 = sys.argv[1], sys.argv[2]
+
+if not os.path.exists(path1) or not os.path.exists(path2):
+    print("Un des fichiers est introuvable.")
+    sys.exit(1)
+
+img1 = load_image(path1)
+img2 = load_image(path2)
+
+if img1.shape != img2.shape:
+    print(f"Erreur : dimensions différentes {img1.shape} vs {img2.shape}")
+    sys.exit(1)
+
+# Conversion en float64 pour la précision
+img1 = img1.astype(np.float64)
+img2 = img2.astype(np.float64)
+
+# Calculs
+psnr_val = compute_psnr(img1, img2)
+ssim_val = compute_ssim(img1, img2)
+
+print(f"PSNR : {psnr_val:.4f} dB")
+print(f"SSIM : {ssim_val:.4f}")
+
+
+// PSNR et SSIM (2)
+import sys
+import os
+import numpy as np
+import tifffile
+from skimage.metrics import peak_signal_noise_ratio as psnr
+from skimage.metrics import structural_similarity as ssim
+
+def load_image(filepath):
+    """Charge une image TIFF et supprime les dimensions inutiles."""
+    try:
+        img = tifffile.imread(filepath)
+        return np.squeeze(img)
+    except Exception as e:
+        print(f"Erreur lors du chargement de {filepath} : {e}")
+        sys.exit(1)
+
+if len(sys.argv) != 3:
+    print("Usage : python3 compare_images.py <image1.tiff> <image2.tiff>")
+    sys.exit(1)
+
+path1, path2 = sys.argv[1], sys.argv[2]
+
+if not os.path.exists(path1):
+    print(f"Fichier introuvable : {path1}")
+    sys.exit(1)
+if not os.path.exists(path2):
+    print(f"Fichier introuvable : {path2}")
+    sys.exit(1)
+
+# Chargement des images
+img1 = load_image(path1)
+img2 = load_image(path2)
+
+# Vérification des dimensions
+if img1.shape != img2.shape:
+    print(f"Erreur : les images n'ont pas les mêmes dimensions : {img1.shape} vs {img2.shape}")
+    sys.exit(1)
+
+# Vérification des types
+if img1.dtype != img2.dtype:
+    print(f"Attention : types différents ({img1.dtype} vs {img2.dtype}), conversion en float64")
+    img1 = img1.astype(np.float64)
+    img2 = img2.astype(np.float64)
+
+# Calcul du PSNR
+psnr_value = psnr(img1, img2, data_range=np.max(img1) - np.min(img1))
+
+# Calcul du SSIM
+ssim_value, _ = ssim(img1, img2, data_range=np.max(img1) - np.min(img1), full=True)
+
+# Résultat
+print(f"PSNR : {psnr_value:.4f} dB")
+print(f"SSIM : {ssim_value:.4f}")
+
+
+
+
+
+// Correction entête
+\begin{table}[ht]
+    \centering
+    \caption{Métadonnées techniques de l’image TIFF}
+    \vspace{0.5em}
+    \begin{tabular}{@{}>{\bfseries}p{5cm} p{8.5cm}@{}}
+        \toprule
+        Champ technique           & Valeur \\
+        \midrule
+        Format du fichier         & \texttt{TIFF} (Tagged Image File Format) \\
+        Taille de l'en-tête       & \texttt{512} octets \\
+        Dimensions de l’image     & \texttt{1024 × 768} pixels \\
+        Profondeur par pixel      & \texttt{64 bits} (\texttt{float64}) \\
+        Compression               & Aucune \\
+        Ordre des octets (endianness) & \texttt{Little endian} \\
+        Date de création          & \texttt{2025-06-04} \\
+        Généré par                & \texttt{tifffile 2025.1} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+
+
+
+// Courbes pour SSIM/PSNR en fonction de k
+#include <Traitements.hpp>
+#include <algorithm>
+#include <cctype>
+#include <iostream>
+#include <cmath>
+#include <fstream>
+
+// Constructeur
+Traitements::Traitements() = default;
+
+// Lecture de config inchangée
+void Traitements::OnReadConfigFile(const char* cfg) {
+    readConfigFile(cfg);
+    for (const auto& a : m_cVars) {
+        std::visit([&](const auto& arg) {
+            if constexpr (std::is_same_v<std::decay_t<decltype(arg)>, std::string>) {
+                if (a.first == "dir_imgs_entree") folderEntrees = arg;
+                if (a.first == "img_noir")         imgNoirPath = arg;
+                if (a.first == "img_trame")        imgTramePath = arg;
+                if (a.first == "img_homog")        imgHomogPath = arg;
+            }
+        }, a.second);
+    }
+}
+
+// Correction paramétrée par k
+void Traitements::CorrectionParametree(TiFF& img, double k) {
+    for (uint32_t y = 0; y < img.getHeight(); ++y) {
+        for (uint32_t x = 0; x < img.getWidth(); ++x) {
+            float val = img.getPixel(x, y);
+            float new_val = std::pow(val, 1.0f / (k + 1.0f)); // gamma-like
+            img.setPixel(x, y, std::clamp(new_val, 0.0f, 1.0f));
+        }
+    }
+}
+
+// Calcule PSNR
+static double computePSNR(const TiFF& ref, const TiFF& test) {
+    double mse = 0.0;
+    uint64_t w = ref.getWidth(), h = ref.getHeight();
+
+    for (uint64_t y = 0; y < h; ++y)
+        for (uint64_t x = 0; x < w; ++x) {
+            float diff = ref.getPixel(x, y) - test.getPixel(x, y);
+            mse += diff * diff;
+        }
+
+    mse /= (w * h);
+    return mse == 0.0 ? std::numeric_limits<double>::infinity()
+                     : 20.0 * std::log10(1.0 / std::sqrt(mse));
+}
+
+// Calcule SSIM simplifié
+static double computeSSIM(const TiFF& a, const TiFF& b) {
+    double mu1 = 0.0, mu2 = 0.0;
+    double sigma1 = 0.0, sigma2 = 0.0, sigma12 = 0.0;
+    uint64_t w = a.getWidth(), h = a.getHeight(), N = w * h;
+
+    for (uint64_t y = 0; y < h; ++y)
+        for (uint64_t x = 0; x < w; ++x) {
+            float va = a.getPixel(x, y);
+            float vb = b.getPixel(x, y);
+            mu1 += va;
+            mu2 += vb;
+        }
+
+    mu1 /= N; mu2 /= N;
+
+    for (uint64_t y = 0; y < h; ++y)
+        for (uint64_t x = 0; x < w; ++x) {
+            float va = a.getPixel(x, y);
+            float vb = b.getPixel(x, y);
+            sigma1 += (va - mu1) * (va - mu1);
+            sigma2 += (vb - mu2) * (vb - mu2);
+            sigma12 += (va - mu1) * (vb - mu2);
+        }
+
+    sigma1 /= N; sigma2 /= N; sigma12 /= N;
+
+    const double C1 = 6.5025, C2 = 58.5225;
+    return ((2 * mu1 * mu2 + C1) * (2 * sigma12 + C2)) /
+           ((mu1 * mu1 + mu2 * mu2 + C1) * (sigma1 + sigma2 + C2));
+}
+
+// Teste plusieurs valeurs de k, enregistre PSNR/SSIM  --> si fait manuellement, faire un as de 0.25
+void Traitements::EvaluationK() {
+    std::vector<double> k_vals = {0.5, 1.0, 2.0, 3.0, 4.0};
+    TiFF ref;
+
+    if (!ref.load("reference.tiff")) {
+        std::cerr << "Erreur : image de référence manquante.\n";
+        return;
+    }
+
+    std::ofstream out("resultats.csv");
+    out << "k,PSNR,SSIM\n";
+
+    for (double k : k_vals) {
+        TiFF img;
+        if (!img.load("entree.tiff")) {
+            std::cerr << "Erreur : image d'entrée manquante.\n";
+            return;
+        }
+
+        CorrectionParametree(img, k);
+        double psnr = computePSNR(ref, img);
+        double ssim = computeSSIM(ref, img);
+
+        std::cout << "k = " << k << " → PSNR = " << psnr << ", SSIM = " << ssim << "\n";
+        out << k << "," << psnr << "," << ssim << "\n";
+
+        // Optionnel : sauvegarder l’image corrigée
+        std::string outname = "out_k" + std::to_string(static_cast<int>(k * 10)) + ".tiff";
+        img.save(outname);
+    }
+
+    out.close();
+    std::cout << "Fichier resultats.csv généré.\n";
+}
+
+// Appel principal
+void Traitements::Process() {
+    OnReadConfigFile("config.p");
+    EvaluationK();  // Appelle la fonction qui génère le CSV
+}
+
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.ticker import ScalarFormatter
+import csv
+
+# --- Chargement des données ---
+k_vals, psnr_vals, ssim_vals = [], [], []
+
+with open("resultats.csv", 'r') as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        k_vals.append(float(row['k']))
+        psnr_vals.append(float(row['PSNR']))
+        ssim_vals.append(float(row['SSIM']))
+
+# --- Création de la figure ---
+fig, ax1 = plt.subplots(figsize=(10, 6))
+
+# Couleurs pour PSNR et SSIM
+color1 = 'tab:blue'
+color2 = 'tab:green'
+
+# Axe X logarithmique
+ax1.set_xscale('log')
+ax1.set_xlabel("Valeur de k (échelle logarithmique)", fontsize=12)
+
+# Axe Y gauche : PSNR
+ax1.set_ylabel("PSNR (dB)", color=color1, fontsize=12)
+psnr_plot, = ax1.plot(k_vals, psnr_vals, marker='o', color=color1, label="PSNR", linewidth=2)
+ax1.tick_params(axis='y', labelcolor=color1)
+
+# Format X : pas de notation scientifique
+ax1.get_xaxis().set_major_formatter(ScalarFormatter())
+ax1.ticklabel_format(style='plain', axis='x')
+ax1.grid(True, which='both', linestyle='--', alpha=0.4)
+
+# Axe Y droit : SSIM
+ax2 = ax1.twinx()
+ax2.set_ylabel("SSIM", color=color2, fontsize=12)
+ssim_plot, = ax2.plot(k_vals, ssim_vals, marker='s', color=color2, label="SSIM", linewidth=2)
+ax2.tick_params(axis='y', labelcolor=color2)
+
+# Légende combinée
+lines = [psnr_plot, ssim_plot]
+labels = [line.get_label() for line in lines]
+ax1.legend(lines, labels, loc='lower right', fontsize=11)
+
+# Titre global
+plt.title("PSNR et SSIM en fonction de k", fontsize=14)
+
+# Sauvegarde + affichage
+fig.tight_layout()
+plt.savefig("psnr_ssim_vs_k.png", dpi=300)
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
