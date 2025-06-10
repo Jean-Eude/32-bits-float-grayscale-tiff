@@ -1,0 +1,131 @@
+PArler de transformées par ondelettes pour lpoints blancs
+
+
+\section{Évaluation de la qualité des images}
+
+Pour évaluer la qualité des images générées ou restaurées, nous avons utilisé deux métriques objectives largement reconnues dans le domaine du traitement d’images : le \textbf{PSNR (Peak Signal-to-Noise Ratio)} et le \textbf{SSIM (Structural Similarity Index Measure)}.
+
+Le PSNR mesure le rapport entre l’intensité maximale d’un pixel dans l’image et l’erreur quadratique moyenne (MSE) entre l’image originale et l’image traitée. Il est exprimé en décibels (dB) et défini par :
+
+\begin{equation}
+    PSNR = 10 \cdot \log_{10} \left( \frac{MAX_I^2}{MSE} \right)
+\end{equation}
+
+où $MAX_I$ est la valeur maximale d’un pixel (255 pour une image sur 8 bits), et le MSE est donné par :
+
+\begin{equation}
+    MSE = \frac{1}{mn} \sum_{i=1}^{m} \sum_{j=1}^{n} \left[ I(i,j) - K(i,j) \right]^2
+\end{equation}
+
+Un PSNR plus élevé indique une image de meilleure qualité. Typiquement, une valeur supérieure à 30 dB est jugée acceptable.
+
+En complément du PSNR, nous avons utilisé le SSIM, une métrique qui prend en compte les structures locales, la luminance et le contraste pour évaluer la similarité entre deux images. Le SSIM est défini par :
+
+\begin{equation}
+    SSIM(x, y) = \frac{(2\mu_x \mu_y + C_1)(2\sigma_{xy} + C_2)}{(\mu_x^2 + \mu_y^2 + C_1)(\sigma_x^2 + \sigma_y^2 + C_2)}
+\end{equation}
+
+où $\mu_x$, $\mu_y$ sont les moyennes des images $x$ et $y$, $\sigma_x^2$, $\sigma_y^2$ leurs variances respectives, et $\sigma_{xy}$ leur covariance. $C_1$ et $C_2$ sont des constantes de stabilisation.
+
+Le SSIM varie entre 0 et 1, où une valeur proche de 1 indique une forte similarité structurelle. Contrairement au PSNR, le SSIM est mieux corrélé à la perception visuelle humaine.
+
+Ainsi, l'utilisation conjointe du PSNR et du SSIM nous permet d'obtenir une évaluation à la fois quantitative et perceptuelle de la qualité des images produites.
+
+
+Perspectives :
+Ce travail ouvre la voie à plusieurs pistes d'amélioration et d'approfondissement. Une première perspective consisterait à généraliser l'approche à des données plus variées, afin d'évaluer sa robustesse dans des contextes réels. De plus, l'intégration d'une méthode d'apprentissage adaptative permettrait d'améliorer la précision des résultats tout en réduisant le coût computationnel.
+
+
+// Faire tableau dans office
+
+
+// Méthodes détections :
+\section{Méthodes avancées pour l’analyse des trous de collimateur et des niveaux de gris}
+
+L’analyse automatique des trous de collimateurs, en particulier dans les systèmes d’imagerie nucléaire (SPECT, PET), repose sur des techniques avancées de vision par ordinateur. Ces méthodes ne se limitent pas à la détection des ouvertures (blobs), mais permettent aussi d’extraire des caractéristiques radiométriques telles que les niveaux de gris (nDG), qui sont essentiels pour l’évaluation de la transmission, de la géométrie et des défauts potentiels du collimateur.
+
+\subsection*{1. Détection et mesure multiscale : Reisenhofer \& King (2019)}
+
+Reisenhofer et King~\cite{reisenhofer2019} proposent une méthode multirésolution fondée sur la convolution de l’image avec des \textit{molecules symétriques}, capables de capturer finement les structures circulaires ou elliptiques, même déformées. Cette approche est robuste au bruit et s’adapte bien aux images de collimateurs réels.
+
+Une fois les blobs localisés, des régions d’intérêt (ROI) sont définies automatiquement autour de chaque trou, et la valeur moyenne des niveaux de gris y est mesurée. Ces nDG permettent de détecter des irrégularités de fabrication ou des obstructions partielles.
+
+\subsection*{2. Approche séquentielle sur structures hexagonales : Kubrikov et al. (2020)}
+
+Dans le cadre de collimateurs à motif hexagonal, Kubrikov et al.~\cite{kubrikov2020} combinent un prétraitement d’image (filtrage morphologique et seuillage adaptatif), une détection de contours, et une identification des blobs en grille. Les centres des hexagones sont localisés par transformée de Hough polygonale.
+
+L’analyse des nDG est ensuite effectuée pour chaque trou détecté. L’uniformité des niveaux mesurés permet d’évaluer l’homogénéité du collimateur et de repérer les défauts d’usinage ou d’alignement angulaire.
+
+\subsection*{3. Traitement sur grille hexagonale : Schlosser et al. (2019)}
+
+Schlosser et al.~\cite{schlosser2019} introduisent \textit{HexNet}, une architecture de traitement d’images basée sur une grille hexagonale. Contrairement à la grille cartésienne traditionnelle, ce cadre est naturellement adapté aux structures géométriques des collimateurs médicaux modernes.
+
+Ce système permet de mieux représenter la géométrie hexagonale des trous, d’optimiser la segmentation et la comparaison locale des intensités (nDG). Il est particulièrement utile pour la visualisation avancée et les traitements statistiques des variations d’intensité à travers le réseau.
+
+\bigskip
+
+En combinant détection de forme, extraction automatique des ROI et analyse radiométrique, ces méthodes permettent de produire une cartographie complète des nDG dans l'image du collimateur. Cette analyse peut être utilisée pour le contrôle qualité, la simulation Monte Carlo inverse ou l’ajustement fin de paramètres de reconstruction.
+
+\bibliographystyle{unsrt}
+\bibliography{collimateur}
+
+
+[1] T. Estruch, "Comment fonctionnent les capteurs CCD et CMOS ?", \textit{Photoniques}, no. 79, pp. 39–42, 2015. \url{https://www.photoniques.com/articles/photon/pdf/2015/06/photon201579p39.pdf}
+
+[2] L. V. Upham & D. F. Englert, "Radionuclide Imaging", in \textit{Handbook of Radioactivity Analysis}, Academic Press, 2003. \url{https://doi.org/10.1016/B978-012436603-9/50018-1}
+
+[3] R. C. de Sena et al., "A simple method based on the application of a CCD camera as a sensor to detect low concentrations of barium sulfate in suspension", \textit{Sensors (Basel)}, vol. 11, no. 1, pp. 864–875, 2011. \url{https://doi.org/10.3390/s110100864}
+
+[4] H. Z. Zeinali et al., "Measurement of the collimator hole angulation...", \textit{Modern Instrumentation}, vol. 1, no. 4, 2012. \url{https://doi.org/10.4236/mi.2012.14007}
+
+[5] A. Popowicz et al., "Analysis of Dark Current in BRITE Nanosatellite CCD Sensors", \textit{Sensors}, vol. 18, 479, 2018. \url{https://doi.org/10.3390/s18020479}
+
+[6] G. Sibbens & T. Altzitzoglou, "Preparation of radioactive sources for radionuclide metrology", \textit{Metrologia}, vol. 44, pp. S71–S78, 2007. \url{https://doi.org/10.1088/0026-1394/44/4/S09}
+
+[7] B. E. A. Saleh & M. C. Teich, \textit{Fundamentals of Photonics}, Wiley, 1991.
+
+[8] C. Wieczorek et al., "Modeling resolution and penetration in collimators", \textit{Physica Medica}, vol. 21, no. 3, 2005.
+
+[9] M. de Jong et al., "A Parallel-Cone Collimator for High-Energy SPECT", \textit{IEEE TNS}, vol. 58, no. 5, 2011. \url{https://doi.org/10.1109/TNS.2011.2159291}
+
+[10] G. Velásquez et al., "3D-printed gamma collimator characterization", \textit{Sensors and Actuators A}, vol. 358, 2025. (À paraître)
+
+[11] A. Kubrikov et al., "Hexagonal grid detection for collimator structure", \textit{IEEE TMI}, vol. 39, no. 2, 2020. \url{https://doi.org/10.1109/TMI.2019.2948732}
+
+[12] T. Schlosser et al., "HexNet: Hexagon-based CNNs", \textit{Pattern Recognition}, vol. 91, 2019. \url{https://doi.org/10.1016/j.patcog.2019.02.005}
+
+[13] M. Reisenhofer & S. King, "Blob Detection with Symmetric Molecules", \textit{SIAM J. Imaging Sciences}, vol. 12, no. 4, 2019. \url{https://doi.org/10.1137/18M1228022}
+
+[14] S. W. Hasinoff, "Photon, Poisson noise", in \textit{Encyclopedia of Computer Vision}, 2016. \url{https://doi.org/10.1007/978-0-387-31439-6_482}
+
+[15] F. Salmon et al., "Poisson noise reduction with non-local PCA", arXiv, 2012. \url{https://arxiv.org/abs/1206.0338}
+
+[16] K. Eckert et al., "Noise from Undetected Sources in DES Images", arXiv, 2020. \url{https://arxiv.org/abs/2004.05618}
+
+[17] P. Astier et al., "The shape of the Photon Transfer Curve of CCD sensors", arXiv, 2019. \url{https://arxiv.org/abs/1905.08677}
+
+[18] B. Zadnik & J. W. Beletic, "CCD readout noise in speckle imaging", \textit{Appl. Opt.}, vol. 37, no. 2, 1998. \url{https://doi.org/10.1364/AO.37.000361}
+
+[19] K. B. W. Harpsøe et al., "Bayesian photon counting with EMCCDs", \textit{A&A}, vol. 541, A50, 2012. \url{https://doi.org/10.1051/0004-6361/201118475}
+
+[20] N. B. Nemati et al., "Photon counting with EMCCD: Techniques", AAS, 2023. (Présentation)
+
+[21] C. Zietlow & J. K. N. Lindner, "Noise model for scintillation-based CCD detectors", \textit{Scientific Reports}, vol. 15, article 3815, 2025. \url{https://doi.org/10.1038/s41598-025-39841-y}
+
+[22] C. Lage et al., "Poisson_CCD: Simulator for modeling CCDs", \textit{J. Appl. Phys.}, vol. 130, 164502, 2021. \url{https://doi.org/10.1063/5.0058894}
+
+[23] R. Lukac, "Signal-dependent noise in digital cameras", \textit{IEEE ICIP}, 2009. \url{https://projet.liris.cnrs.fr/imagine/pub/proceedings/ICIP-2009/pdfs/0003881.pdf}
+
+[24] M. Haeberli, "A physically-based camera model", INRIA, 2012. \url{https://hal.science/hal-00733538v2/file/camera_model.pdf}
+
+[25] J. Nakamura (ed.), \textit{Image Sensors and Signal Processing for Digital Still Cameras}, CRC Press, 2005. \url{http://ultra.sdk.free.fr/docs/DxO/Image%20Sensors%20and%20Signal%20Processing%20for%20Digital%20Still%20Cameras.pdf}
+
+[26] E. Robert et al., "Radiographie X éclair et imagerie de fluorescence X", \textit{J. Phys. IV France}, vol. 11, pp. Pr7-171–Pr7-174, 2001. \url{https://doi.org/10.1051/jp4:2001751}
+
+[27] D. Zwillinger, R. E. Mickens, "Poisson noise modeling in digital detection systems", \textit{Journal of Sound and Vibration}, vol. 195, no. 5, pp. 593–601, 1996. \url{https://pdf.sciencedirectassets.com/.../1-s2.0-S0022460X96904320/main.pdf}
+
+[28] J. Fadili, "Analyse multirésolution pour la reconstruction d’images compressées : méthodes variationnelles, ondeslettes et algorithmes proximaux", manuscrit HDR, GREYC – Université de Caen, 2012. \url{https://fadili.users.greyc.fr/Pub/bibtex/manuscript/manuscrit430.pdf}
+
+
+
+
