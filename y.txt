@@ -1,0 +1,54 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{array}
+\geometry{margin=2.5cm}
+
+\begin{document}
+
+\begin{table}[ht]
+    \centering
+    \vspace{0.5em}
+    \begin{tabular}{@{}>{\centering\arraybackslash}p{6cm} >{\centering\arraybackslash}p{8.5cm}@{}}
+        \toprule
+        \textbf{Propriété} & \textbf{Spécification} \\
+        \midrule
+        Format du fichier         & \texttt{TIFF} (Tagged Image File Format) \\
+        Taille de l'en-tête       & \texttt{512} octets \\
+        Dimensions de l’image     & \texttt{1024 × 768} pixels \\
+        Profondeur par pixel      & \texttt{64 bits} (\texttt{float64}) \\
+        Compression               & Aucune \\
+        Ordre des octets (endianness) & \texttt{Little endian} \\
+        Date de création          & \texttt{2025-06-04} \\
+        Généré par                & \texttt{tifffile 2025.1} \\
+        \bottomrule
+    \end{tabular}
+    \caption{\textbf{Métadonnées techniques de l’image TIFF}}
+\end{table}
+
+
+\begin{table}[ht]
+    \centering
+    \vspace{0.5em}
+    \begin{tabular}{|>{\centering\arraybackslash}p{3cm}
+                    |>{\centering\arraybackslash}p{3cm}
+                    |>{\centering\arraybackslash}p{3cm}
+                    |>{\centering\arraybackslash}p{3cm}
+                    |>{\centering\arraybackslash}p{3cm}|}
+        \hline
+        \textbf{Identifiant} & \textbf{Utilisateur} & \textbf{Création} & \textbf{Statut} & \textbf{Mise à jour} \\
+        \hline
+        001 & Jean Dupont & 2025-06-01 & Validé & 2025-06-10 \\
+        \hline
+        002 & Alice Martin & 2025-06-02 & En attente & 2025-06-09 \\
+        \hline
+        003 & Bob Legrand & 2025-06-03 & Rejeté & 2025-06-08 \\
+        \hline
+    \end{tabular}
+    \caption{\textbf{Exemple de tableau avec bordures verticales}}
+\end{table}
+
+
+
+\end{document}
