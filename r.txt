@@ -1,0 +1,21 @@
+// local
+\usepackage[colorlinks=true, linkcolor=red]{hyperref}
+
+\begin{document}
+
+{
+\hypersetup{hidelinks}
+\tableofcontents
+}
+
+\newpage
+\section{Introduction}
+Voici un lien vers \hyperref[sec:conclusion]{la conclusion}.
+
+\section{Conclusion}
+\label{sec:conclusion}
+Merci !
+
+
+// global
+\usepackage[hidelinks]{hyperref}
