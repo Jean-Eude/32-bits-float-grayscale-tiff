@@ -39,5 +39,16 @@ Cela montre clairement d’où vient cette info ou visuel, sans surcharger la sl
 Puis, tu mets la référence complète dans ta bibliographie finale.
 
 
-POur pén, reprndre l'autre schéma.
-Pour pt blancs, faire dans un tableau (comme oral précédent) + mettre exemples de correction
+. POur pén, reprndre l'autre schéma.
+. Pour pt blancs, faire dans un tableau (comme oral précédent)cea + mettre exemples de correction
+. Améliorer le schéma de l'introduction
+
+
+Étapes dans PowerPoint (Windows ou Mac) :
+Clique sur l’onglet "Insertion" dans le ruban.
+Clique sur "Numéro de diapositive".
+Dans la fenêtre qui s’ouvre, clique sur "Appliquer partout" si ce n'est pas encore fait.
+Maintenant, va dans l’onglet "Création" (ou "Conception").
+Clique sur "Taille des diapositives" (à droite) → puis sur "Personnaliser la taille des diapositives…".
+Dans la fenêtre, en bas, change le "Numéro de la première diapositive" à 1.
+Clique sur OK.
