@@ -1,0 +1,43 @@
+La radiographie éclair : Technique de radiographie utilisant des impulsions de rayons X. Elle permet de visualiser des phénomènes rapides qui se déroulent dans des corps opaques ou entourés de lumière visible intense.
+
+Image de caractérisation : Image permettant de caractériser la structure interne, la densité, les défauts ou les comportements dynamiques de l'objet radiographié.
+
+Sources :
+[1] T. Estruch, "Comment fonctionnent les capteurs CCD et CMOS ?", Photoniques, no. 79, pp. 39–42, 2015.
+[2] L. V. Upham & D. F. Englert, "Radionuclide Imaging", in Handbook of Radioactivity Analysis, Academic Press, 2003.
+[3] R. C. de Sena et al., "A simple method based on the application of a CCD camera as a sensor to detect low concentrations of barium sulfate in suspension", Sensors (Basel), vol. 11, no. 1, pp. 864–875, 2011.
+[4] H. Z. Zeinali et al., "Measurement of the collimator hole angulation...", Modern Instrumentation, vol. 1, no. 4, 2012.
+[5] A. Popowicz et al., "Analysis of Dark Current in BRITE Nanosatellite CCD Sensors", Sensors, vol. 18, 479, 2018.
+[6] G. Sibbens & T. Altzitzoglou, "Preparation of radioactive sources for radionuclide metrology", Metrologia, vol. 44, pp. S71–S78, 2007.
+[7] B. E. A. Saleh & M. C. Teich, Fundamentals of Photonics, Wiley, 1991.
+[8] C. Wieczorek et al., "Modeling resolution and penetration in collimators", Physica Medica, vol. 21, no. 3, 2005.
+[9] M. de Jong et al., "A Parallel-Cone Collimator for High-Energy SPECT", IEEE TNS, vol. 58, no. 5, 2011.
+[10] G. Velásquez et al., "3D-printed gamma collimator characterization", Sensors and Actuators A, vol. 358, 2025. (À paraître)
+[11] A. Kubrikov et al., "Hexagonal grid detection for collimator structure", IEEE TMI, vol. 39, no. 2, 2020.
+[12] T. Schlosser et al., "HexNet: Hexagon-based CNNs", Pattern Recognition, vol. 91, 2019.
+[13] M. Reisenhofer & S. King, "Blob Detection with Symmetric Molecules", SIAM J. Imaging Sciences, vol. 12, no. 4, 2019.
+[14] S. W. Hasinoff, "Photon, Poisson noise", in Encyclopedia of Computer Vision, 2016.
+[15] F. Salmon et al., "Poisson noise reduction with non-local PCA", arXiv, 2012.
+[16] K. Eckert et al., "Noise from Undetected Sources in DES Images", arXiv, 2020.
+[17] P. Astier et al., "The shape of the Photon Transfer Curve of CCD sensors", arXiv, 2019.
+[18] B. Zadnik & J. W. Beletic, "CCD readout noise in speckle imaging", Appl. Opt., vol. 37, no. 2, 1998.
+[19] K. B. W. Harpsøe et al., "Bayesian photon counting with EMCCDs", A&A, vol. 541, A50, 2012.
+[20] N. B. Nemati et al., "Photon counting with EMCCD: Techniques", AAS, 2023. (Présentation)
+[21] C. Zietlow & J. K. N. Lindner, "Noise model for scintillation-based CCD detectors", Scientific Reports, vol. 15, article 3815, 2025.
+[22] C. Lage et al., "Poisson_CCD: Simulator for modeling CCDs", J. Appl. Phys., vol. 130, 164502, 2021.
+[23] R. Lukac, "Signal-dependent noise in digital cameras", IEEE ICIP, 2009.
+[24] M. Haeberli, "A physically-based camera model", INRIA, 2012.
+[25] J. Nakamura (ed.), Image Sensors and Signal Processing for Digital Still Cameras, CRC Press, 2005.
+[26] E. Robert et al., "Radiographie X éclair et imagerie de fluorescence X", J. Phys. IV France, vol. 11, pp. Pr7-171–Pr7-174, 2001.
+[27] D. Zwillinger, R. E. Mickens, "Poisson noise modeling in digital detection systems", Journal of Sound and Vibration, vol. 195, no. 5, pp. 593–601, 1996.
+[28] J. Fadili, "Analyse multirésolution pour la reconstruction d’images compressées : méthodes variationnelles, ondeslettes et algorithmes proximaux", manuscrit HDR, GREYC – Université de Caen, 2012.
+
+
+Pour une image ou une méthode, c’est la même règle !
+Tu peux mettre une petite citation discrète du type [3] ou [7] en bas à gauche (ou à droite) directement sur la slide où tu montres l’image ou expliques la méthode.
+Cela montre clairement d’où vient cette info ou visuel, sans surcharger la slide.
+Puis, tu mets la référence complète dans ta bibliographie finale.
+
+
+POur pén, reprndre l'autre schéma.
+Pour pt blancs, faire dans un tableau (comme oral précédent) + mettre exemples de correction
