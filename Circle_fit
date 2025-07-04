@@ -1,0 +1,45 @@
+#include <iostream>
+#include <vector>
+#include <Eigen/Dense>
+
+struct Point {
+    double x, y;
+};
+
+int main() {
+    // Exemple : points d'un contour
+    std::vector<Point> points = {
+        {1.0, 7.0},
+        {2.0, 6.0},
+        {5.0, 8.0},
+        {7.0, 7.0},
+        {9.0, 5.0},
+        {4.0, 7.0},
+        {6.0, 9.0}
+    };
+
+    size_t N = points.size();
+    Eigen::MatrixXd A(N, 3);
+    Eigen::VectorXd B(N);
+
+    for (size_t i = 0; i < N; ++i) {
+        double xi = points[i].x;
+        double yi = points[i].y;
+        A(i, 0) = 2.0 * xi;
+        A(i, 1) = 2.0 * yi;
+        A(i, 2) = 1.0;
+        B(i) = xi * xi + yi * yi;
+    }
+
+    // Solve least squares
+    Eigen::Vector3d solution = A.colPivHouseholderQr().solve(B);
+    double a = solution(0);
+    double b = solution(1);
+    double c = solution(2);
+    double R = std::sqrt(a * a + b * b + c);
+
+    std::cout << "Centre du cercle : (" << a << ", " << b << ")" << std::endl;
+    std::cout << "Rayon : " << R << std::endl;
+
+    return 0;
+}
