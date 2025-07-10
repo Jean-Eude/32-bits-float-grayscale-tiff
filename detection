@@ -1,0 +1,83 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <iomanip>
+
+using namespace std;
+
+// Calcule l'angle entre deux points
+double computeThetaXY(int x1, int y1, int x2, int y2) {
+    double dx = x2 - x1;
+    double dy = y2 - y1;
+    return atan2(dy, dx);
+}
+
+// Adaptative thresholding avancé (moyenne locale + contrainte C)
+vector<vector<uint8_t>> adaptiveThreshold(const vector<vector<uint8_t>>& image, int windowSize, int C) {
+    int rows = image.size();
+    int cols = image[0].size();
+    vector<vector<uint8_t>> result(rows, vector<uint8_t>(cols, 0));
+    int half = windowSize / 2;
+
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            int sum = 0;
+            int count = 0;
+
+            for (int wi = -half; wi <= half; ++wi) {
+                for (int wj = -half; wj <= half; ++wj) {
+                    int ni = i + wi;
+                    int nj = j + wj;
+                    if (ni >= 0 && ni < rows && nj >= 0 && nj < cols) {
+                        sum += image[ni][nj];
+                        count++;
+                    }
+                }
+            }
+
+            int mean = sum / count;
+            result[i][j] = (image[i][j] > mean - C) ? 255 : 0;
+        }
+    }
+
+    return result;
+}
+
+// Détection de contours simple (gradient par différence centrée)
+vector<vector<uint8_t>> detectEdges(const vector<vector<uint8_t>>& image) {
+    int rows = image.size();
+    int cols = image[0].size();
+    vector<vector<uint8_t>> edges(rows, vector<uint8_t>(cols, 0));
+
+    for (int i = 1; i < rows - 1; ++i) {
+        for (int j = 1; j < cols - 1; ++j) {
+            int gx = image[i][j+1] - image[i][j-1];
+            int gy = image[i+1][j] - image[i-1][j];
+
+            int gradient = sqrt(gx * gx + gy * gy);
+            edges[i][j] = (gradient > 30) ? 255 : 0; // seuil ajustable
+        }
+    }
+
+    return edges;
+}
+
+// Detection trous 
+// 1. Normalisation
+double mean = computeMean(image);
+double std = computeStd(image, mean);
+normalizeImage(image, mean, std);
+
+// 2. Seuillage adaptatif
+auto binary = adaptiveThreshold(image, windowSize = 15, C = 5);
+
+// 3. Extraction des composants connexes
+vector<Blob> blobs = extractConnectedComponents(binary);
+
+// 4. Filtrage : aire, circularité, intensité moyenne
+for (Blob& b : blobs) {
+    if (b.area < MIN || b.area > MAX) continue;
+    if (!isCircular(b)) continue;
+    if (!isDarkEnough(b, image)) continue;
+    keep(b);
+}
