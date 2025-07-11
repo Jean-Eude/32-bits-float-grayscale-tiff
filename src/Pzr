@@ -1,0 +1,41 @@
+void TiFF::normalizeBetweenPercentiles(double pmin, double pmax) {
+    if (data.empty() || pmin >= pmax) return;
+
+    const int L = 65536;
+    std::vector<size_t> hist(L, 0);
+    size_t total = data.size();
+
+    // Étape 1 : histogramme
+    for (double px : data) {
+        uint16_t val = static_cast<uint16_t>(std::clamp(px, 0.0, 65535.0));
+        hist[val]++;
+    }
+
+    // Étape 2 : CDF
+    std::vector<size_t> cdf(L, 0);
+    cdf[0] = hist[0];
+    for (int i = 1; i < L; ++i) {
+        cdf[i] = cdf[i - 1] + hist[i];
+    }
+
+    // Étape 3 : chercher vmin et vmax selon les percentiles
+    size_t cdf_min = static_cast<size_t>(std::clamp(pmin, 0.0, 1.0) * (total - 1));
+    size_t cdf_max = static_cast<size_t>(std::clamp(pmax, 0.0, 1.0) * (total - 1));
+
+    int vmin = 0;
+    while (vmin < L && cdf[vmin] < cdf_min) ++vmin;
+
+    int vmax = L - 1;
+    while (vmax > 0 && cdf[vmax] > cdf_max) --vmax;
+
+    if (vmax <= vmin) return;
+
+    double in_range = static_cast<double>(vmax - vmin);
+
+    // Étape 4 : normalisation dans [vmin, vmax]
+    for (auto& px : data) {
+        double val = std::clamp(px, static_cast<double>(vmin), static_cast<double>(vmax));
+        double norm = (val - vmin) / in_range;
+        px = vmin + norm * in_range; // ou garder tel quel, selon le format final
+    }
+}
