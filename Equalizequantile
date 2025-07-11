@@ -1,0 +1,40 @@
+void TiFF::normalizeHistogramPercentiles(double pmin = 0.05, double pmax = 0.95) {
+    if (data.empty() || pmin >= pmax) return;
+
+    const int L = 65536;
+    std::vector<size_t> hist(L, 0);
+    size_t total = data.size();
+
+    // Étape 1 : construire histogramme
+    for (double px : data) {
+        uint16_t val = static_cast<uint16_t>(std::clamp(px, 0.0, 65535.0));
+        hist[val]++;
+    }
+
+    // Étape 2 : construire CDF
+    std::vector<size_t> cdf(L, 0);
+    cdf[0] = hist[0];
+    for (int i = 1; i < L; ++i) {
+        cdf[i] = cdf[i - 1] + hist[i];
+    }
+
+    // Étape 3 : chercher vmin et vmax selon les percentiles
+    size_t cdf_min = static_cast<size_t>(pmin * total);
+    size_t cdf_max = static_cast<size_t>(pmax * total);
+
+    int vmin = 0;
+    while (vmin < L && cdf[vmin] < cdf_min) ++vmin;
+
+    int vmax = L - 1;
+    while (vmax > 0 && cdf[vmax] > cdf_max) --vmax;
+
+    if (vmax <= vmin) return; // éviter division par 0 ou erreur
+
+    double range = static_cast<double>(vmax - vmin);
+
+    // Étape 4 : remapper tous les pixels en [0, 65535] selon vmin/vmax
+    for (auto& px : data) {
+        double norm = (px - vmin) / range;
+        px = static_cast<double>(std::clamp(std::round(norm * 65535.0), 0.0, 65535.0));
+    }
+}
