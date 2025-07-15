@@ -1,0 +1,109 @@
+# 1. Binaire
+zc_bin = (zc_mask > 0).astype(np.uint8) * 255
+
+# 2. Dilation pour "renforcer" les contours
+kernel_dilate = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+zc_dilated = cv2.dilate(zc_bin, kernel_dilate, iterations=1)
+
+# 3. Fermer les contours
+kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+zc_closed = cv2.morphologyEx(zc_dilated, cv2.MORPH_CLOSE, kernel_close)
+
+# 4. Inverser : trous candidats
+holes_candidate = cv2.bitwise_not(zc_closed)
+
+# 5. Supprimer les zones connectées au bord
+h, w = holes_candidate.shape
+mask = np.zeros((h+2, w+2), np.uint8)
+floodfill = holes_candidate.copy()
+cv2.floodFill(floodfill, mask, (0, 0), 255)
+floodfill_inv = cv2.bitwise_not(floodfill)
+
+# 6. Les vrais trous
+holes = cv2.bitwise_and(holes_candidate, floodfill_inv)
+
+# 7. Nettoyage : enlever les trous trop petits
+num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(holes)
+min_area = 100  # à ajuster
+clean_holes = np.zeros_like(holes)
+for i in range(1, num_labels):
+    if stats[i, cv2.CC_STAT_AREA] > min_area:
+        clean_holes[labels == i] = 255
+
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.ndimage import gaussian_filter, label, distance_transform_edt
+from skimage import measure, filters, morphology, segmentation, color
+
+# 1. Charger image (en niveaux de gris)
+from imageio import imread
+image = imread("ton_image.png", as_gray=True)
+
+# 2. Lisser pour éliminer le bruit
+smoothed = gaussian_filter(image, sigma=3)
+
+# 3. Seuillage automatique (Otsu)
+thresh_val = filters.threshold_otsu(smoothed)
+binary = smoothed > thresh_val  # zones lumineuses
+
+# 4. Nettoyage des petites zones
+binary_cleaned = morphology.remove_small_objects(binary, min_size=50)
+
+# 5. Distance transform
+distance = distance_transform_edt(binary_cleaned)
+
+# 6. Trouver les "graines" (pics de distance)
+local_max = morphology.h_maxima(distance, h=0.3 * np.max(distance))
+
+# 7. Labelliser les graines
+markers, _ = label(local_max)
+
+# 8. Watershed pour séparer les sources proches
+labels = segmentation.watershed(-distance, markers, mask=binary_cleaned)
+
+# 9. Extraire régions et dessiner les ellipses
+regions = measure.regionprops(labels)
+
+fig, ax = plt.subplots()
+ax.imshow(image, cmap='gray')
+
+for region in regions:
+    if region.area > 100:
+        y0, x0 = region.centroid
+        orientation = region.orientation
+        a, b = region.major_axis_length / 2, region.minor_axis_length / 2
+
+        t = np.linspace(0, 2*np.pi, 100)
+        x = x0 + a * np.cos(t) * np.cos(orientation) - b * np.sin(t) * np.sin(orientation)
+        y = y0 + a * np.cos(t) * np.sin(orientation) + b * np.sin(t) * np.cos(orientation)
+        ax.plot(x, y, 'r', linewidth=2)
+
+        ax.plot(x0, y0, 'bo')  # centre
+
+plt.title("Sources lumineuses détectées automatiquement")
+plt.axis('off')
+plt.show()
+
+
+
+#include <iostream>
+#include <cmath>
+
+int main() {
+    double x1 = 100, z1 = 200;
+    double x2 = 300, z2 = 250;
+
+    double dx = x2 - x1;
+    double dz = z2 - z1;
+
+    double thetaX = std::atan2(dx, dz);  // horizontal par rapport à vertical
+    double thetaZ = std::atan2(dz, dx);  // vertical par rapport à horizontal
+
+    std::cout << "thetaX = " << thetaX * 180.0 / M_PI << "°" << std::endl;
+    std::cout << "thetaZ = " << thetaZ * 180.0 / M_PI << "°" << std::endl;
+
+    return 0;
+}
+
