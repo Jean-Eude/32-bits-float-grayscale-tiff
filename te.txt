@@ -1,0 +1,31 @@
+Pour détecter des trous dans une image, surtout après un zero-crossing (passage par zéro) — typique d'une détection de contours via le Laplacien du Gaussien (LoG) — le problème du bruit est fréquent. Voici quelques conseils pour améliorer la détection, notamment des trous bruités :
+🔍 1. Comprendre le bruit après le zero-crossing
+
+    Le zero-crossing détecte les endroits où la dérivée seconde change de signe (i.e. contours).
+
+    Le bruit introduit de faux passages par zéro, donc faux contours ou fausses détections de trous.
+
+🧰 2. Approches pour réduire l'impact du bruit
+✅ a. Augmenter la taille du filtre gaussien
+
+    Un sigma plus élevé dans le filtre LoG (Laplacian of Gaussian) réduit le bruit mais adoucit aussi les bords.
+
+    Exemple : cv2.GaussianBlur(image, (0, 0), sigmaX=2.0)
+
+✅ b. Seuillage des zero-crossings par amplitude
+
+    Ne considérer comme passage par zéro que si l’amplitude du Laplacien est suffisante.
+
+    Cela permet d’éliminer les petites variations dues au bruit.
+
+✅ c. Post-traitement morphologique
+
+    Appliquer des opérations morphologiques (comme closing ou opening) sur le masque final des trous pour enlever les petits artefacts.
+
+✅ d. Utiliser un masque de consistance
+
+    Une technique consiste à multiplier le zero-crossing par une carte d’intensité du Laplacien, pour conserver uniquement les bords “forts”.
+
+✅ e. Contour finding + filtrage
+
+    Une fois les contours extraits (ex : cv2.findContours), tu peux filtrer par aire, forme, circularité, etc., pour ne garder que les véritables trous.
