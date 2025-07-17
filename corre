@@ -1,0 +1,281 @@
+#include <iostream>
+#include <cmath>
+
+// Structure pour représenter un point en pixels
+struct Point {
+    double x;
+    double y;
+};
+
+// Calcule l'angle en degrés entre deux points
+// - p1 et p2 : points en pixels
+// - invertY : true si on veut inverser l'axe Y (repère mathématique)
+double computeAngleDegrees(const Point& p1, const Point& p2, bool invertY = false) {
+    double dx = p2.x - p1.x;
+    double dy = p2.y - p1.y;
+    if (invertY) dy = -dy;  // inversion Y pour passer en repère mathématique
+
+    double angleRad = std::atan2(dy, dx);              // Angle en radians
+    double angleDeg = angleRad * 180.0 / M_PI;         // Conversion en degrés
+    if (angleDeg < 0) angleDeg += 360.0;               // Normalisation entre 0 et 360°
+    return angleDeg;
+}
+
+// Calcule la distance physique en centimètres entre deux points
+// - pixelSizeCm : taille physique d'un pixel en cm
+double computeDistanceCm(const Point& p1, const Point& p2, double pixelSizeCm) {
+    double dx = p2.x - p1.x;
+    double dy = p2.y - p1.y;
+    double distancePixels = std::sqrt(dx * dx + dy * dy);
+    return distancePixels * pixelSizeCm;
+}
+
+int main() {
+    // Exemple : deux centres en pixels
+    Point center1 = {100, 200};
+    Point center2 = {150, 250};
+
+    // Taille d'un pixel (en cm) : 0.01 cm/pixel = 0.1 mm/pixel
+    double pixelSizeCm = 0.01;
+
+    // Calcul de l'angle entre les centres
+    double angleImageRepere = computeAngleDegrees(center1, center2, false); // repère image (Y vers le bas)
+    double angleMathRepere  = computeAngleDegrees(center1, center2, true);  // repère math (Y vers le haut)
+
+    // Calcul de la distance physique entre les centres
+    double distanceCm = computeDistanceCm(center1, center2, pixelSizeCm);
+
+    // Affichage des résultats
+    std::cout << "Angle (repère image) : " << angleImageRepere << " °" << std::endl;
+    std::cout << "Angle (repère math)  : " << angleMathRepere  << " °" << std::endl;
+    std::cout << "Distance physique     : " << distanceCm       << " cm" << std::endl;
+
+    return 0;
+}
+
+// Dans classe TiFF
+void resizeByArea(const TiFF& src, TiFF& dst, uint32_t new_width, uint32_t new_height) {
+    dst.create(new_width, new_height);
+
+    float scale_x = static_cast<float>(src.getWidth()) / new_width;
+    float scale_y = static_cast<float>(src.getHeight()) / new_height;
+
+    for (uint32_t y = 0; y < new_height; ++y) {
+        for (uint32_t x = 0; x < new_width; ++x) {
+            float src_x0 = x * scale_x;
+            float src_y0 = y * scale_y;
+            float src_x1 = (x + 1) * scale_x;
+            float src_y1 = (y + 1) * scale_y;
+
+            int x0 = static_cast<int>(std::floor(src_x0));
+            int y0 = static_cast<int>(std::floor(src_y0));
+            int x1 = static_cast<int>(std::ceil(src_x1));
+            int y1 = static_cast<int>(std::ceil(src_y1));
+
+            float sum = 0.0f;
+            float total_weight = 0.0f;
+
+            for (int sy = y0; sy < y1; ++sy) {
+                for (int sx = x0; sx < x1; ++sx) {
+                    float ix0 = std::max(src_x0, static_cast<float>(sx));
+                    float iy0 = std::max(src_y0, static_cast<float>(sy));
+                    float ix1 = std::min(src_x1, static_cast<float>(sx + 1));
+                    float iy1 = std::min(src_y1, static_cast<float>(sy + 1));
+
+                    float area = std::max(0.0f, ix1 - ix0) * std::max(0.0f, iy1 - iy0);
+                    float val = src.getPixel(sx, sy);
+
+                    sum += val * area;
+                    total_weight += area;
+                }
+            }
+
+            dst.setPixel(x, y, (total_weight > 0.0f) ? (sum / total_weight) : 0.0f);
+        }
+    }
+}
+
+
+/////////////////////////////////////////////////////
+Faire morphologie avant
+
+
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <queue>
+#include <algorithm>
+
+struct Point {
+    int x, y;
+};
+
+struct Circle {
+    double cx, cy, r;
+};
+
+void thresholdImage(const std::vector<std::vector<uint8_t>>& gray, std::vector<std::vector<uint8_t>>& bin, uint8_t thresh = 200) {
+    int h = gray.size(), w = gray[0].size();
+    bin = gray;
+    for (int y = 0; y < h; ++y)
+        for (int x = 0; x < w; ++x)
+            bin[y][x] = (gray[y][x] > thresh) ? 1 : 0;
+}
+
+void dfs(int x, int y, const std::vector<std::vector<uint8_t>>& bin,
+         std::vector<std::vector<bool>>& visited, std::vector<Point>& comp) {
+    int h = bin.size(), w = bin[0].size();
+    std::queue<Point> q;
+    q.push({x, y});
+    visited[y][x] = true;
+
+    while (!q.empty()) {
+        Point p = q.front(); q.pop();
+        comp.push_back(p);
+
+        for (int dy = -1; dy <= 1; ++dy)
+            for (int dx = -1; dx <= 1; ++dx) {
+                int nx = p.x + dx, ny = p.y + dy;
+                if (nx >= 0 && ny >= 0 && nx < w && ny < h &&
+                    !visited[ny][nx] && bin[ny][nx] == 1) {
+                    visited[ny][nx] = true;
+                    q.push({nx, ny});
+                }
+            }
+    }
+}
+
+std::vector<std::vector<Point>> getComponents(const std::vector<std::vector<uint8_t>>& bin, int minSize = 100) {
+    int h = bin.size(), w = bin[0].size();
+    std::vector<std::vector<bool>> visited(h, std::vector<bool>(w, false));
+    std::vector<std::vector<Point>> components;
+
+    for (int y = 0; y < h; ++y)
+        for (int x = 0; x < w; ++x)
+            if (bin[y][x] == 1 && !visited[y][x]) {
+                std::vector<Point> comp;
+                dfs(x, y, bin, visited, comp);
+                if (comp.size() >= minSize)
+                    components.push_back(comp);
+            }
+
+    return components;
+}
+
+std::vector<Point> extractContour(const std::vector<std::vector<uint8_t>>& bin,
+                                  const std::vector<Point>& blob) {
+    std::vector<Point> contour;
+    int h = bin.size(), w = bin[0].size();
+
+    for (const auto& p : blob) {
+        bool isEdge = false;
+        for (int dy = -1; dy <= 1 && !isEdge; ++dy)
+            for (int dx = -1; dx <= 1 && !isEdge; ++dx) {
+                int nx = p.x + dx, ny = p.y + dy;
+                if (nx >= 0 && ny >= 0 && nx < w && ny < h && bin[ny][nx] == 0)
+                    isEdge = true;
+            }
+        if (isEdge) contour.push_back(p);
+    }
+    return contour;
+}
+
+std::pair<Point, Point> findNarrowNeck(const std::vector<Point>& contour, double maxDist = 10.0, int minSep = 10) {
+    double bestDist = 1e9;
+    std::pair<Point, Point> bestPair = { {-1, -1}, {-1, -1} };
+
+    for (size_t i = 0; i < contour.size(); ++i)
+        for (size_t j = i + minSep; j < contour.size(); ++j) {
+            int dx = contour[i].x - contour[j].x;
+            int dy = contour[i].y - contour[j].y;
+            double dist = std::sqrt(dx * dx + dy * dy);
+            if (dist < maxDist && dist < bestDist) {
+                bestDist = dist;
+                bestPair = { contour[i], contour[j] };
+            }
+        }
+    return bestPair;
+}
+
+void drawLine(std::vector<std::vector<uint8_t>>& bin, Point p1, Point p2) {
+    int x0 = p1.x, y0 = p1.y;
+    int x1 = p2.x, y1 = p2.y;
+    int dx = std::abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    int dy = -std::abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    int err = dx + dy, e2;
+
+    while (true) {
+        if (y0 >= 0 && y0 < bin.size() && x0 >= 0 && x0 < bin[0].size())
+            bin[y0][x0] = 0;
+        if (x0 == x1 && y0 == y1) break;
+        e2 = 2 * err;
+        if (e2 >= dy) { err += dy; x0 += sx; }
+        if (e2 <= dx) { err += dx; y0 += sy; }
+    }
+}
+
+Circle fitCircle(const std::vector<Point>& points) {
+    double sumX = 0, sumY = 0;
+    for (const auto& p : points) {
+        sumX += p.x;
+        sumY += p.y;
+    }
+    double cx = sumX / points.size();
+    double cy = sumY / points.size();
+
+    double sumR = 0;
+    for (const auto& p : points) {
+        double dx = p.x - cx;
+        double dy = p.y - cy;
+        sumR += std::sqrt(dx * dx + dy * dy);
+    }
+    double r = sumR / points.size();
+    return { cx, cy, r };
+}
+
+int main() {
+    // Exemple : image definie en dur
+    std::vector<std::vector<uint8_t>> gray = {
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 255, 255, 0, 0, 255, 255, 255, 0, 0},
+        {0, 255, 255, 0, 0, 255, 255, 255, 0, 0},
+        {0, 0, 0, 0, 0, 255, 255, 255, 0, 0},
+        {0, 255, 255, 255, 0, 0, 0, 0, 0, 0},
+        {0, 255, 255, 255, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 255, 255, 255, 0, 0},
+        {0, 255, 255, 0, 0, 255, 255, 255, 0, 0},
+        {0, 255, 255, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+    };
+    int width = gray[0].size(), height = gray.size();
+
+    std::vector<std::vector<uint8_t>> bin;
+    thresholdImage(gray, bin, 200);
+    auto components = getComponents(bin, 5);
+
+    for (const auto& blob : components) {
+        auto contour = extractContour(bin, blob);
+        auto [p1, p2] = findNarrowNeck(contour);
+        if (p1.x >= 0 && p2.x >= 0) {
+            std::cout << "\nEtranglement detecte entre (" << p1.x << "," << p1.y << ") et ("
+                      << p2.x << "," << p2.y << ")\n";
+            drawLine(bin, p1, p2);
+        }
+    }
+
+    auto finalBlobs = getComponents(bin, 5);
+    std::cout << "\nNombre de trous detectes : " << finalBlobs.size() << "\n";
+
+    for (const auto& blob : finalBlobs) {
+        auto contour = extractContour(bin, blob);
+        Circle c = fitCircle(contour);
+        std::cout << "Cercle approxime : centre=(" << c.cx << ", " << c.cy << "), rayon=" << c.r << "\n";
+    }
+
+    return 0;
+}
+
+
+
+
+
