@@ -1,0 +1,47 @@
+TiFF resizeByArea(const TiFF& src, uint32_t new_width, uint32_t new_height) {
+    TiFF result;
+    result.create(new_width, new_height);
+
+    float scale_x = static_cast<float>(src.getWidth()) / new_width;
+    float scale_y = static_cast<float>(src.getHeight()) / new_height;
+
+    for (uint32_t y = 0; y < new_height; ++y) {
+        for (uint32_t x = 0; x < new_width; ++x) {
+            float src_x0 = x * scale_x;
+            float src_y0 = y * scale_y;
+            float src_x1 = (x + 1) * scale_x;
+            float src_y1 = (y + 1) * scale_y;
+
+            int x0 = static_cast<int>(std::floor(src_x0));
+            int y0 = static_cast<int>(std::floor(src_y0));
+            int x1 = static_cast<int>(std::ceil(src_x1));
+            int y1 = static_cast<int>(std::ceil(src_y1));
+
+            float sum = 0.0f;
+            float total_weight = 0.0f;
+
+            for (int sy = y0; sy < y1; ++sy) {
+                for (int sx = x0; sx < x1; ++sx) {
+                    if (sx < 0 || sy < 0 || sx >= static_cast<int>(src.getWidth()) || sy >= static_cast<int>(src.getHeight()))
+                        continue;
+
+                    float ix0 = std::max(src_x0, static_cast<float>(sx));
+                    float iy0 = std::max(src_y0, static_cast<float>(sy));
+                    float ix1 = std::min(src_x1, static_cast<float>(sx + 1));
+                    float iy1 = std::min(src_y1, static_cast<float>(sy + 1));
+
+                    float area = std::max(0.0f, ix1 - ix0) * std::max(0.0f, iy1 - iy0);
+                    float val = src.getPixel(sx, sy);
+
+                    sum += val * area;
+                    total_weight += area;
+                }
+            }
+
+            float out_val = (total_weight > 0.0f) ? (sum / total_weight) : 0.0f;
+            result.setPixel(x, y, out_val);
+        }
+    }
+
+    return result;
+}
