@@ -1,0 +1,27 @@
+double averageInDisk(const TiFF& image, int cx, int cy, double radius) {
+    uint32_t width = image.getWidth();
+    uint32_t height = image.getHeight();
+
+    double sum = 0.0;
+    int count = 0;
+
+    int r_int = static_cast<int>(std::ceil(radius));
+    double r2 = radius * radius;
+
+    for (int dy = -r_int; dy <= r_int; ++dy) {
+        int y = cy + dy;
+        if (y < 0 || static_cast<uint32_t>(y) >= height) continue;
+
+        for (int dx = -r_int; dx <= r_int; ++dx) {
+            int x = cx + dx;
+            if (x < 0 || static_cast<uint32_t>(x) >= width) continue;
+
+            if (dx * dx + dy * dy <= r2) {
+                sum += static_cast<double>(image.getPixel(x, y));
+                count++;
+            }
+        }
+    }
+
+    return (count > 0) ? (sum / count) : 0.0;
+}
