@@ -1,0 +1,217 @@
+void TiFF::resizeByArea(const TiFF& src, uint32_t new_width, uint32_t new_height) {
+    create(new_width, new_height);
+    
+    float scale_x = static_cast<float>(src.getWidth()) / new_width;
+    float scale_y = static_cast<float>(src.getHeight()) / new_height;
+
+    for (uint32_t y = 0; y < new_height; ++y) {
+        for (uint32_t x = 0; x < new_width; ++x) {
+            float src_x0 = x * scale_x;
+            float src_y0 = y * scale_y;
+            float src_x1 = (x + 1) * scale_x;
+            float src_y1 = (y + 1) * scale_y;
+
+            int x0 = static_cast<int>(std::floor(src_x0));
+            int y0 = static_cast<int>(std::floor(src_y0));
+            int x1 = static_cast<int>(std::ceil(src_x1));
+            int y1 = static_cast<int>(std::ceil(src_y1));
+
+            float sum = 0.0f;
+            float total_weight = 0.0f;
+
+            for (int sy = y0; sy < y1; ++sy) {
+                for (int sx = x0; sx < x1; ++sx) {
+                    if (sx >= 0 && sy >= 0 && static_cast<uint32_t>(sx) < src.getWidth() && static_cast<uint32_t>(sy) < src.getHeight()) {
+                        float ix0 = std::max(src_x0, static_cast<float>(sx));
+                        float iy0 = std::max(src_y0, static_cast<float>(sy));
+                        float ix1 = std::min(src_x1, static_cast<float>(sx + 1));
+                        float iy1 = std::min(src_y1, static_cast<float>(sy + 1));
+
+                        float area = std::max(0.0f, ix1 - ix0) * std::max(0.0f, iy1 - iy0);
+                        float val = src.getPixel(sx, sy);
+
+                        sum += val * area;
+                        total_weight += area;
+                    }
+                }
+            }
+
+            data[y * new_width + x] = (total_weight > 0.0f) ? (sum / total_weight) : 0.0f;
+        }
+    }
+}
+
+void TiFF::resizeByArea(const TiFF& src, uint32_t new_width, uint32_t new_height) {
+    float scale_x = static_cast<float>(src.getWidth()) / new_width;
+    float scale_y = static_cast<float>(src.getHeight()) / new_height;
+
+    std::vector<float> result(new_width * new_height, 0.0f);
+
+    for (uint32_t y = 0; y < new_height; ++y) {
+        for (uint32_t x = 0; x < new_width; ++x) {
+            float src_x0 = x * scale_x;
+            float src_y0 = y * scale_y;
+            float src_x1 = (x + 1) * scale_x;
+            float src_y1 = (y + 1) * scale_y;
+
+            int x0 = static_cast<int>(std::floor(src_x0));
+            int y0 = static_cast<int>(std::floor(src_y0));
+            int x1 = static_cast<int>(std::ceil(src_x1));
+            int y1 = static_cast<int>(std::ceil(src_y1));
+
+            float sum = 0.0f;
+            float total_weight = 0.0f;
+
+            for (int sy = y0; sy < y1; ++sy) {
+                for (int sx = x0; sx < x1; ++sx) {
+                    if (sx >= 0 && sy >= 0 &&
+                        static_cast<uint32_t>(sx) < src.getWidth() &&
+                        static_cast<uint32_t>(sy) < src.getHeight()) {
+
+                        float ix0 = std::max(src_x0, static_cast<float>(sx));
+                        float iy0 = std::max(src_y0, static_cast<float>(sy));
+                        float ix1 = std::min(src_x1, static_cast<float>(sx + 1));
+                        float iy1 = std::min(src_y1, static_cast<float>(sy + 1));
+
+                        float area = std::max(0.0f, ix1 - ix0) * std::max(0.0f, iy1 - iy0);
+                        float val = src.getPixel(sx, sy);
+
+                        sum += val * area;
+                        total_weight += area;
+                    }
+                }
+            }
+
+            result[y * new_width + x] = (total_weight > 0.0f) ? (sum / total_weight) : 0.0f;
+        }
+    }
+
+    // Redimensionner les métadonnées
+    width = new_width;
+    height = new_height;
+
+    // Remplacer les données par le résultat
+    data = std::move(result);
+}
+
+
+#include <vector>
+#include <unordered_map>
+#include <queue>
+#include <cmath>
+#include <cstdint>
+#include <iostream>
+#include <Eigen/Dense>
+
+struct Circle {
+    double xc;
+    double yc;
+    double radius;
+};
+
+// Étape 1 : composantes connexes dans un masque double > 0
+std::unordered_map<int, std::vector<std::pair<uint32_t, uint32_t>>>
+labelConnectedComponentsDouble(const std::vector<std::vector<double>>& mask) {
+    int height = mask.size();
+    int width = mask[0].size();
+    std::vector<std::vector<int>> labels(height, std::vector<int>(width, 0));
+    int current_label = 1;
+
+    std::unordered_map<int, std::vector<std::pair<uint32_t, uint32_t>>> components;
+
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            if (mask[y][x] > 0 && labels[y][x] == 0) {
+                std::queue<std::pair<int, int>> q;
+                q.push({x, y});
+                labels[y][x] = current_label;
+
+                while (!q.empty()) {
+                    auto [cx, cy] = q.front(); q.pop();
+                    components[current_label].emplace_back(static_cast<uint32_t>(cx), static_cast<uint32_t>(cy));
+
+                    const int dx[] = {1, -1, 0, 0};
+                    const int dy[] = {0, 0, 1, -1};
+
+                    for (int dir = 0; dir < 4; ++dir) {
+                        int nx = cx + dx[dir];
+                        int ny = cy + dy[dir];
+                        if (nx >= 0 && ny >= 0 && nx < width && ny < height &&
+                            mask[ny][nx] > 0 && labels[ny][nx] == 0) {
+                            labels[ny][nx] = current_label;
+                            q.push({nx, ny});
+                        }
+                    }
+                }
+
+                ++current_label;
+            }
+        }
+    }
+
+    return components;
+}
+
+// Étape 2 : cercle pondéré (weighted least squares circle fitting) avec Eigen
+Circle fitCircleWeightedEigen(
+    const std::vector<std::pair<uint32_t, uint32_t>>& points,
+    const std::vector<std::vector<double>>& mask
+) {
+    if (points.size() < 3) return {0.0, 0.0, 0.0};
+
+    Eigen::MatrixXd A(points.size(), 3);
+    Eigen::VectorXd B(points.size());
+    Eigen::VectorXd W(points.size()); // poids
+
+    for (size_t i = 0; i < points.size(); ++i) {
+        uint32_t x_ = points[i].first;
+        uint32_t y_ = points[i].second;
+        double x = static_cast<double>(x_);
+        double y = static_cast<double>(y_);
+        double r2 = x * x + y * y;
+        double w = mask[y_][x_];
+
+        A(i, 0) = w * x;
+        A(i, 1) = w * y;
+        A(i, 2) = w * 1.0;
+        B(i) = w * r2;
+        W(i) = w;
+    }
+
+    // Solve the weighted least squares problem
+    Eigen::Vector3d sol = A.colPivHouseholderQr().solve(B);
+    double a = sol(0);
+    double b = sol(1);
+    double c = sol(2);
+
+    double xc = a / 2.0;
+    double yc = b / 2.0;
+    double radius = std::sqrt(xc * xc + yc * yc + c);
+
+    return {xc, yc, radius};
+}
+
+// Traitement principal
+void processMask(const std::vector<std::vector<double>>& mask) {
+    auto components = labelConnectedComponentsDouble(mask);
+
+    for (const auto& [label, points] : components) {
+        Circle c = fitCircleWeightedEigen(points, mask);
+        std::cout << "Objet #" << label
+                  << " : Centre=(" << c.xc << ", " << c.yc
+                  << "), Rayon=" << c.radius << "\n";
+    }
+}
+
+// Exemple d'appel
+int main() {
+    std::vector<std::vector<double>> mask = {
+        {0, 0, 0, 0, 0, 0},
+        {0, 50000, 50000, 0, 30000, 0},
+        {0, 50000, 50000, 0, 30000, 0},
+        {0, 0, 0, 0, 0, 0}
+    };
+
+    processMask(mask);
+    return 0;
+}
