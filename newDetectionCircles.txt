@@ -1,0 +1,73 @@
+struct Circle {
+    double xc;
+    double yc;
+    double radius;
+};
+
+void processMaskAndFitCircles(const std::vector<std::vector<double>>& mask) {
+    int height = mask.size();
+    if (height == 0) return;
+    int width = mask[0].size();
+
+    std::vector<std::vector<int>> labels(height, std::vector<int>(width, 0));
+    int current_label = 1;
+
+    std::unordered_map<int, std::vector<std::pair<uint32_t, uint32_t>>> components;
+
+    // Détection des composantes connexes
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            if (mask[y][x] > 0 && labels[y][x] == 0) {
+                std::queue<std::pair<int, int>> q;
+                q.push({x, y});
+                labels[y][x] = current_label;
+
+                while (!q.empty()) {
+                    auto [cx, cy] = q.front(); q.pop();
+                    components[current_label].emplace_back(cx, cy);
+
+                    const int dx[] = {1, -1, 0, 0};
+                    const int dy[] = {0, 0, 1, -1};
+
+                    for (int dir = 0; dir < 4; ++dir) {
+                        int nx = cx + dx[dir];
+                        int ny = cy + dy[dir];
+                        if (nx >= 0 && ny >= 0 && nx < width && ny < height &&
+                            mask[ny][nx] > 0 && labels[ny][nx] == 0) {
+                            labels[ny][nx] = current_label;
+                            q.push({nx, ny});
+                        }
+                    }
+                }
+                ++current_label;
+            }
+        }
+    }
+
+    // Ajustement de cercle pour chaque composante
+    for (const auto& [label, points] : components) {
+        if (points.size() < 3) continue;
+
+        Eigen::MatrixXd A(points.size(), 3);
+        Eigen::VectorXd B(points.size());
+
+        for (size_t i = 0; i < points.size(); ++i) {
+            double x = static_cast<double>(points[i].first);
+            double y = static_cast<double>(points[i].second);
+            A(i, 0) = 2.0 * x;
+            A(i, 1) = 2.0 * y;
+            A(i, 2) = 1.0;
+            B(i) = x * x + y * y;
+        }
+
+        Eigen::Vector3d sol = A.colPivHouseholderQr().solve(B);
+        double xc = sol(0);
+        double yc = sol(1);
+        double c = sol(2);
+        double radius = std::sqrt(xc * xc + yc * yc + c);
+
+        std::cout << "Objet #" << label
+                  << " : Centre=(" << xc << ", " << yc
+                  << "), Rayon=" << radius << "\n";
+    }
+}
