@@ -1,0 +1,44 @@
+Le problème que tu rencontres vient de la numérotation verticale (des lignes) dans ton plan ASCII et la manière dont les coordonnées (col, row) sont interprétées.
+
+En ASCII :
+
+    1
+2       3
+4       5
+    6
+
+Mais ce que ton code fait, c’est lire les lignes de haut en bas, donc :
+
+    Ligne 0 : 1
+
+    Ligne 1 : 2 3
+
+    Ligne 2 : 4 5
+
+    Ligne 3 : 6
+
+Cela donne :
+
+row=0 : 1
+row=1 : 2   3
+row=2 : 4   5
+row=3 : 6
+
+Donc le point 4 est en (0,2) et le point 6 est en (1,3), ce qui est logique en coordonnées de fichier texte.
+Mais visuellement sur un graphe, l’axe Y augmente vers le haut habituellement — alors que dans un fichier ASCII, le Y augmente vers le bas.
+✅ Solution
+
+Il faut inverser la coordonnée Y (row) pour corriger l’orientation verticale :
+
+Juste après avoir fait le parsing, ajoute :
+
+// Inverser les coordonnées Y pour que le haut de l’ASCII soit en haut du graphe
+for (auto& [id, pos] : logicalPositions) {
+    pos.second = static_cast<double>(maxRow - 1) - pos.second;
+}
+
+Cela va corriger le placement du point 4 et du point 6 dans ton rendu final.
+
+
+
+
