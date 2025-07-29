@@ -1,0 +1,229 @@
+Version 1 : Normalisation robuste sans inversion verticale
+
+// --- Génération asciiPlan étendu avec tabulations ---
+std::ostringstream oss;
+bool supported = true;
+
+switch (nbCircles) {
+    case 2:  oss << "1\t2"; break;
+    case 3:  oss << "\t1\t\n2\t\t3"; break;
+    case 4:  oss << "1\t\t2\n\t3\t4"; break;
+    case 5:  oss << "\t1\t\n2\t\t3\n4\t5"; break;
+    case 6:  oss << "\t1\t\n2\t\t3\n4\t\t5\n\t6"; break;
+    case 7:  oss << "\t\t1\t\n\t2\t\t3\n4\t\t5\t6"; break;
+    case 8:  oss << "\t1\t2\n3\t\t4\n5\t6\t7\n\t\t8"; break;
+    case 9:  oss << "1\t2\t3\n4\t5\t6\n7\t8\t9"; break;
+    case 10: oss << "1\t2\t3\t4\t5\n6\t7\t8\t9\t10"; break;
+    case 12: oss << "1\t2\t3\t4\n5\t6\t7\t8\n9\t10\t11\t12"; break;
+    case 15: oss << "1\t2\t3\t4\t5\n6\t7\t8\t9\t10\n11\t12\t13\t14\t15"; break;
+    case 16: oss << "1\t2\t3\t4\n5\t6\t7\t8\n9\t10\t11\t12\n13\t14\t15\t16"; break;
+    default:
+        supported = false;
+        break;
+}
+
+if (!supported) {
+    std::cerr << "[INFO] Aucun plan ASCII défini pour " << nbCircles << " cercles.\n";
+    return;
+}
+
+std::string asciiPlan = oss.str();
+
+// --- Parsing du plan logique ---
+std::map<int, std::pair<double, double>> logicalPositions;
+std::istringstream iss(asciiPlan);
+std::string line;
+int row = 0, maxCol = 0;
+
+while (std::getline(iss, line)) {
+    std::istringstream lineStream(line);
+    std::string token;
+    int col = 0;
+    while (std::getline(lineStream, token, '\t')) {
+        if (!token.empty() && std::isdigit(token[0])) {
+            int id = std::stoi(token);
+            logicalPositions[id] = {static_cast<double>(col), static_cast<double>(row)};
+        }
+        ++col;
+    }
+    maxCol = std::max(maxCol, col);
+    ++row;
+}
+int maxRow = row;
+
+// --- Normalisation des centres détectés ---
+double minX = std::numeric_limits<double>::max(), maxX = -minX;
+double minY = std::numeric_limits<double>::max(), maxY = -minY;
+
+for (const auto& c : circles) {
+    minX = std::min(minX, c.xc);
+    maxX = std::max(maxX, c.xc);
+    minY = std::min(minY, c.yc);
+    maxY = std::max(maxY, c.yc);
+}
+
+std::vector<std::pair<double, double>> normCenters;
+double denomX = maxX - minX;
+double denomY = maxY - minY;
+if (denomX < 1e-9) denomX = 1e-9;
+if (denomY < 1e-9) denomY = 1e-9;
+
+for (const auto& c : circles) {
+    double nx = (c.xc - minX) / denomX;
+    double ny = (c.yc - minY) / denomY;
+    normCenters.emplace_back(nx, ny);
+}
+
+// --- Propriétés des cercles ---
+std::map<int, std::pair<std::string, float>> circleProperties;
+for (int i = 1; i <= nbCircles; ++i) {
+    std::string label(1, 'A' + ((i - 1) % 26));
+    float intensity = 1.0f - (i - 1) / static_cast<float>(std::max(nbCircles - 1, 1));
+    circleProperties[i] = {label, intensity};
+}
+
+// --- Appariement logique → cercles détectés (normalisation avec check div/0) ---
+std::vector<Circle> ordered(nbCircles);
+std::vector<bool> taken(nbCircles, false);
+
+if (maxCol <= 1 || maxRow <= 1) {
+    std::cerr << "[WARN] Plan ASCII invalide (division par zéro évitée).\n";
+    return;
+}
+
+for (const auto& [id, logicalPos] : logicalPositions) {
+    double bestDist = std::numeric_limits<double>::max();
+    int bestIndex = -1;
+    double normX = logicalPos.first / static_cast<double>(maxCol - 1);
+    double normY = logicalPos.second / static_cast<double>(maxRow - 1);
+
+    for (int i = 0; i < nbCircles; ++i) {
+        if (taken[i]) continue;
+        double dx = normCenters[i].first - normX;
+        double dy = normCenters[i].second - normY;
+        double dist = dx * dx + dy * dy;
+        if (dist < bestDist) {
+            bestDist = dist;
+            bestIndex = i;
+        }
+    }
+    if (bestIndex >= 0) {
+        Circle circle = circles[bestIndex];
+        circle.id = id;
+        if (circleProperties.count(id)) {
+            circle.label = circleProperties[id].first;
+            circle.intensity = circleProperties[id].second;
+        }
+        ordered[id - 1] = circle;
+        taken[bestIndex] = true;
+    }
+}
+
+// --- Affichage enrichi ---
+for (const auto& c : ordered) {
+    std::cout << "Cercle #" << c.id
+              << " → Pos = (" << c.xc << ", " << c.yc << ")"
+              << ", Rayon = " << c.radius
+              << ", Label = " << c.label
+              << ", Intensité = " << c.intensity
+              << "\n";
+}
+
+Version 2 : Normalisation robuste avec inversion verticale (normY = 1 - normY)
+
+// --- Génération asciiPlan étendu avec tabulations ---
+std::ostringstream oss;
+bool supported = true;
+
+switch (nbCircles) {
+    case 2:  oss << "1\t2"; break;
+    case 3:  oss << "\t1\t\n2\t\t3"; break;
+    case 4:  oss << "1\t\t2\n\t3\t4"; break;
+    case 5:  oss << "\t1\t\n2\t\t3\n4\t5"; break;
+    case 6:  oss << "\t1\t\n2\t\t3\n4\t\t5\n\t6"; break;
+    case 7:  oss << "\t\t1\t\n\t2\t\t3\n4\t\t5\t6"; break;
+    case 8:  oss << "\t1\t2\n3\t\t4\n5\t6\t7\n\t\t8"; break;
+    case 9:  oss << "1\t2\t3\n4\t5\t6\n7\t8\t9"; break;
+    case 10: oss << "1\t2\t3\t4\t5\n6\t7\t8\t9\t10"; break;
+    case 12: oss << "1\t2\t3\t4\n5\t6\t7\t8\n9\t10\t11\t12"; break;
+    case 15: oss << "1\t2\t3\t4\t5\n6\t7\t8\t9\t10\n11\t12\t13\t14\t15"; break;
+    case 16: oss << "1\t2\t3\t4\n5\t6\t7\t8\n9\t10\t11\t12\n13\t14\t15\t16"; break;
+    default:
+        supported = false;
+        break;
+}
+
+if (!supported) {
+    std::cerr << "[INFO] Aucun plan ASCII défini pour " << nbCircles << " cercles.\n";
+    return;
+}
+
+std::string asciiPlan = oss.str();
+
+// --- Parsing du plan logique ---
+std::map<int, std::pair<double, double>> logicalPositions;
+std::istringstream iss(asciiPlan);
+std::string line;
+int row = 0, maxCol = 0;
+
+while (std::getline(iss, line)) {
+    std::istringstream lineStream(line);
+    std::string token;
+    int col = 0;
+    while (std::getline(lineStream, token, '\t')) {
+        if (!token.empty() && std::isdigit(token[0])) {
+            int id = std::stoi(token);
+            logicalPositions[id] = {static_cast<double>(col), static_cast<double>(row)};
+        }
+        ++col;
+    }
+    maxCol = std::max(maxCol, col);
+    ++row;
+}
+int maxRow = row;
+
+// --- Normalisation des centres détectés ---
+double minX = std::numeric_limits<double>::max(), maxX = -minX;
+double minY = std::numeric_limits<double>::max(), maxY = -minY;
+
+for (const auto& c : circles) {
+    minX = std::min(minX, c.xc);
+    maxX = std::max(maxX, c.xc);
+    minY = std::min(minY, c.yc);
+    maxY = std::max(maxY, c.yc);
+}
+
+std::vector<std::pair<double, double>> normCenters;
+double denomX = maxX - minX;
+double denomY = maxY - minY;
+if (denomX < 1e-9) denomX = 1e-9;
+if (denomY < 1e-9) denomY = 1e-9;
+
+for (const auto& c : circles) {
+    double nx = (c.xc - minX) / denomX;
+    double ny = (c.yc - minY) / denomY;
+    normCenters.emplace_back(nx, ny);
+}
+
+// --- Propriétés des cercles ---
+std::map<int, std::pair<std::string, float>> circleProperties;
+for (int i = 1; i <= nbCircles; ++i) {
+    std::string label(1, 'A' + ((i - 1) % 26));
+    float intensity = 1.0f - (i - 1) / static_cast<float>(std::max(nbCircles - 1, 1));
+    circleProperties[i] = {label, intensity};
+}
+
+// --- Appariement logique → cercles détectés (normalisation avec check div/0 + inversion Y) ---
+std::vector<Circle> ordered(nbCircles);
+std::vector<bool> taken(nbCircles, false);
+
+if (maxCol <= 1 || maxRow <= 1) {
+    std::cerr << "[WARN] Plan ASCII invalide (division par zéro évitée).\n";
+    return;
+}
+
+for (const auto& [id, logicalPos] : logicalPositions) {
+    double bestDist = std::numeric_limits<double>::max();
+    int bestIndex = -1;
+    double normX = logicalPos.first / static_cast<double>(maxCol - 1);
+    double normY = logicalPos.second /
