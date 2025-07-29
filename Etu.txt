@@ -1,0 +1,37 @@
+std::istringstream iss(asciiPlan);
+std::string line;
+int row = 0;
+int maxCol = 0;
+std::vector<std::string> lines;
+
+while (std::getline(iss, line)) {
+    std::string token;
+    size_t start = 0;
+    int col = 0;
+
+    while (start <= line.size()) {
+        size_t end = line.find('\t', start);
+        if (end == std::string::npos)
+            end = line.size();
+
+        token = line.substr(start, end - start);
+
+        if (!token.empty() && std::isdigit(token[0])) {
+            int id = std::stoi(token);
+            logicalPositions[id] = {static_cast<double>(col), static_cast<double>(row)};
+        }
+
+        ++col;
+        start = end + 1;
+    }
+
+    maxCol = std::max(maxCol, col);
+    ++row;
+}
+
+int maxRow = row;
+
+// Inverser Y pour représentation visuelle correcte
+for (auto& [id, pos] : logicalPositions) {
+    pos.second = static_cast<double>(maxRow - 1) - pos.second;
+}
