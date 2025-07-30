@@ -1,0 +1,393 @@
+1. Plan ASCII avec tabulations et parsing par \t
+
+    Tu utilises maintenant des tabulations \t pour séparer les colonnes dans oss, ce qui rend le plan ASCII beaucoup plus structuré.
+
+    Le parsing se fait avec std::getline(lineStream, token, '\t') sur chaque ligne, donc tu découpes ligne par ligne selon les tabulations, et chaque "case" (colonne) est un token.
+
+    Ce parsing est plus robuste que de compter simplement les caractères, car la position logique est donnée par l’indice de colonne col, pas par la position dans la chaîne.
+
+2. Gestion du nombre de colonnes et de lignes
+
+    Tu calcules maxCol (max colonnes sur une ligne) et maxRow (nombre de lignes).
+
+    Puis tu vérifies if (maxCol <= 1 || maxRow <= 1) pour éviter division par zéro à la normalisation des positions logiques.
+
+3. Normalisation des positions logiques
+
+    La position logique de chaque cercle est calculée ainsi :
+
+    normX = logicalPos.first / static_cast<double>(maxCol - 1);
+    normY = logicalPos.second / static_cast<double>(maxRow - 1);
+
+    Contrairement à la version précédente où la normalisation était sur la longueur de la ligne en caractères, ici c’est sur le nombre de colonnes délimitées par tabulations, donc plus cohérent.
+
+4. Normalisation des centres détectés
+
+    Même logique : on calcule min/max des coordonnées réelles (xc, yc) pour normaliser.
+
+    Évite la division par zéro avec un epsilon.
+
+5. Appariement logique → cercles détectés
+
+    Recherche pour chaque position logique la meilleure correspondance dans les centres détectés.
+
+    Tu remplis le vecteur ordered indexé par id - 1 pour garantir que le résultat est trié par id.
+
+6. Affichage final enrichi
+
+    Pour chaque cercle, tu affiches id, position, rayon, label et intensité.
+
+En résumé
+
+Cette version est plus propre et plus robuste, notamment parce que :
+
+    Le plan ASCII utilise des tabulations pour délimiter clairement colonnes et lignes.
+
+    Le parsing exploite cette structure tabulée plutôt que la position dans une chaîne de caractères.
+
+    La normalisation est basée sur le nombre de colonnes et de lignes, pas sur la longueur des lignes en caractères, ce qui évite des erreurs liées à l’espacement ou aux tabulations variables.
+
+    Le tableau final ordered assure que les cercles sont triés par leur id logique.
+
+#include "Test_Cercles.hpp"
+#include <Eigen/Dense>
+
+// Structures globales (pas besoin de les redéfinir dans la fonction)
+struct Point {
+    double x, y;
+};
+
+struct Circle {  // Cercle avec centre flottant et propriétés
+    int id = -1;
+    double xc, yc;
+    double radius;
+    std::string label;
+    float intensity;
+};
+
+std::string trim(const std::string& s) {
+    size_t start = s.find_first_not_of(" \t");
+    if (start == std::string::npos) return "";
+    size_t end = s.find_last_not_of(" \t");
+    return s.substr(start, end - start + 1);
+}
+
+void assignLogicalPositions(std::vector<Circle>& circles) {
+    int nbCircles = (int)circles.size();
+
+    std::ostringstream oss;
+    bool supported = true;
+
+    switch (nbCircles) {
+    case 5:
+        oss << "\t\t1\t\t2\n"
+            << "\t\t\t5\t\n"
+            << "4\t\t\t3\n";
+        break;
+    case 7:
+        oss << "\t\t1\t\t\n"
+            << "6\t\t\t2\n"
+            << "\t\t7\t\t\n"
+            << "5\t\t\t3\n"
+            << "\t\t4\t\t";
+        break;
+        default:
+            supported = false;
+            break;
+    }
+
+    if (!supported) {
+        std::cerr << "[INFO] Aucun plan ASCII défini pour " << nbCircles << " cercles.\n";
+        return;
+    }
+
+    std::string asciiPlan = oss.str();
+
+    std::map<int, std::pair<double, double>> logicalPositions;
+    std::istringstream iss(asciiPlan);
+    std::string line;
+    int row = 0;
+    int maxLineLength = 0;
+
+    // 1) Calculer la largeur max en nombre de caractères
+    {
+        std::istringstream iss2(asciiPlan);
+        std::string l;
+        while (std::getline(iss2, l)) {
+            maxLineLength = std::max(maxLineLength, (int)l.size());
+        }
+    }
+
+    // 2) Pour chaque ligne, chercher les chiffres et enregistrer la position (col = indice char)
+    while (std::getline(iss, line)) {
+        for (int col = 0; col < (int)line.size(); ++col) {
+            char c = line[col];
+            if (std::isdigit(c)) {
+                int id = c - '0'; // si plus grand que 9, adapter ici (par exemple stoi)
+                logicalPositions[id] = {static_cast<double>(col), static_cast<double>(row)};
+            }
+        }
+        ++row;
+    }
+    int maxRow = row;
+
+    if (maxLineLength <= 1 || maxRow <= 1) {
+        std::cerr << "[WARN] Plan ASCII invalide (maxLineLength=" << maxLineLength << ", maxRow=" << maxRow << ")\n";
+        return;
+    }
+
+    // Normalisation des positions logiques sur [0..1]
+    // col → x, row → y
+    for (auto& [id, pos] : logicalPositions) {
+        pos.first /= (maxLineLength - 1);
+        pos.second /= (maxRow - 1);
+    }
+
+    // Normalisation des centres détectés
+    double minX = std::numeric_limits<double>::max(), maxX = -minX;
+    double minY = std::numeric_limits<double>::max(), maxY = -minY;
+
+    for (const auto& c : circles) {
+        minX = std::min(minX, c.xc);
+        maxX = std::max(maxX, c.xc);
+        minY = std::min(minY, c.yc);
+        maxY = std::max(maxY, c.yc);
+    }
+
+    std::vector<std::pair<double, double>> normCenters;
+    double denomX = maxX - minX;
+    double denomY = maxY - minY;
+    if (denomX < 1e-9) denomX = 1e-9;
+    if (denomY < 1e-9) denomY = 1e-9;
+
+    for (const auto& c : circles) {
+        double nx = (c.xc - minX) / denomX;
+        double ny = (c.yc - minY) / denomY;
+        normCenters.emplace_back(nx, ny);
+    }
+
+    // Propriétés des cercles
+    std::map<int, std::pair<std::string, float>> circleProperties;
+    for (int i = 1; i <= nbCircles; ++i) {
+        std::string label(1, 'A' + ((i - 1) % 26));
+        float intensity = 1.0f - (i - 1) / static_cast<float>(std::max(nbCircles - 1, 1));
+        circleProperties[i] = {label, intensity};
+    }
+
+    std::vector<bool> taken(nbCircles, false);
+
+    for (const auto& [id, logicalPos] : logicalPositions) {
+        double bestDist = std::numeric_limits<double>::max();
+        int bestIndex = -1;
+        double normX = logicalPos.first;
+        double normY = logicalPos.second;
+
+        for (int i = 0; i < nbCircles; ++i) {
+            if (taken[i]) continue;
+            double dx = normCenters[i].first - normX;
+            double dy = normCenters[i].second - normY;
+            double dist = dx * dx + dy * dy;
+            if (dist < bestDist) {
+                bestDist = dist;
+                bestIndex = i;
+            }
+        }
+        if (bestIndex >= 0) {
+            circles[bestIndex].id = id;
+            circles[bestIndex].label = circleProperties[id].first;
+            circles[bestIndex].intensity = circleProperties[id].second;
+            taken[bestIndex] = true;
+        }
+    }
+
+    std::sort(circles.begin(), circles.end(), [](const Circle& a, const Circle& b) {
+        return a.id < b.id;
+    });
+}
+
+void Test_Cercles::OnAppInit() {
+    img = std::make_unique<Image>(getRenderer(), getWidth(), getHeight());
+    img->OnImageInit();
+}
+void Test_Cercles::OnAppHandleEvents() {}
+void Test_Cercles::OnAppFixedUpdate() {}
+void Test_Cercles::OnAppUpdate() {
+    if (!img) return;
+
+    const int w = img->GetWidth();
+    const int h = img->GetHeight();
+
+    struct Cercle { int cx, cy, r; };
+
+    const int rayon = 50;
+    const int centerX = w / 2;
+    const int centerY = h / 2;
+    const int stepX = 120;  // écart horizontal entre colonnes
+    const int stepY = 100;  // écart vertical entre lignes
+
+    /*
+    // Coordonnées des 7 cercles selon ton plan :
+    std::vector<Cercle> cercles = {
+        { centerX, centerY - 2 * stepY, rayon },             // 1 (en haut, milieu)
+        { centerX + 2 * stepX, centerY - stepY, rayon },     // 2 (en haut droite)
+        { centerX + 2 * stepX, centerY + stepY, rayon },     // 3 (en bas droite)
+        { centerX, centerY + 2 * stepY, rayon },             // 4 (en bas milieu)
+        { centerX - 2 * stepX, centerY + stepY, rayon },     // 5 (en bas gauche)
+        { centerX - 2 * stepX, centerY - stepY, rayon },     // 6 (en haut gauche)
+        { centerX, centerY, rayon }                           // 7 (au centre)
+    };*/
+
+    // Coordonnées des 5 cercles selon le plan simplifié :
+    std::vector<Cercle> cercles = {
+        { centerX - stepX, centerY - stepY, rayon }, // 1 (en haut gauche)
+        { centerX + stepX, centerY - stepY, rayon }, // 2 (en haut droite)
+        { centerX + stepX, centerY + stepY, rayon }, // 3 (en bas droite)
+        { centerX - stepX, centerY + stepY, rayon }, // 4 (en bas gauche)
+        { centerX,        centerY,       rayon }    // 5 (au centre)
+    };
+
+    // Création image binaire
+    std::vector<uint8_t> binaryImage(w * h, 0);
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            for (const auto& c : cercles) {
+                int dx = x - c.cx;
+                int dy = y - c.cy;
+                if (dx * dx + dy * dy <= c.r * c.r) {
+                    binaryImage[y * w + x] = 255;
+                    break;
+                }
+            }
+        }
+    }
+
+    // Fit cercles avec Eigen
+    std::vector<Eigen::Vector3d> solutions;
+    for (size_t i = 0; i < cercles.size(); ++i) {
+        const auto& cercle = cercles[i];
+        int rSearch = cercle.r + 10;
+
+        std::vector<Point> points;
+        int xStart = std::max(0, cercle.cx - rSearch);
+        int xEnd   = std::min(w - 1, cercle.cx + rSearch);
+        int yStart = std::max(0, cercle.cy - rSearch);
+        int yEnd   = std::min(h - 1, cercle.cy + rSearch);
+
+        for (int y = yStart; y <= yEnd; ++y) {
+            for (int x = xStart; x <= xEnd; ++x) {
+                if (binaryImage[y * w + x] == 255) {
+                    points.push_back({double(x), double(y)});
+                }
+            }
+        }
+
+        if (points.size() < 3) continue;
+
+        size_t N = points.size();
+        Eigen::MatrixXd A(N, 3);
+        Eigen::VectorXd B(N);
+        for (size_t j = 0; j < N; ++j) {
+            double xi = points[j].x;
+            double yi = points[j].y;
+            A(j, 0) = 2.0 * xi;
+            A(j, 1) = 2.0 * yi;
+            A(j, 2) = 1.0;
+            B(j) = xi * xi + yi * yi;
+        }
+
+        Eigen::Vector3d sol = A.colPivHouseholderQr().solve(B);
+        double a = sol(0);
+        double b = sol(1);
+        double c = sol(2);
+        double R = std::sqrt(a * a + b * b + c);
+
+        solutions.emplace_back(a, b, R);
+    }
+
+    // Conversion en Circle pour appariement logique
+    std::vector<Circle> circles;
+    for (size_t i = 0; i < solutions.size(); ++i) {
+        const auto& sol = solutions[i];
+        circles.push_back(Circle{
+            -1,
+            sol(0),
+            sol(1),
+            sol(2),
+            "",
+            0.f
+        });
+    }
+
+    assignLogicalPositions(circles);
+
+    // Sauvegarde des coordonnées corrigées avec labels et intensités
+    std::ofstream ofs("../src/Apps/Test_Cercles/bin/cercles_coords.txt");
+    if (ofs.is_open()) {
+        for (const auto& c : circles) {
+            ofs << "Cercle #" << c.id << " (label " << c.label << ") : centre approx = (" << c.xc << ", " << c.yc
+                << "), rayon approx = " << c.radius << ", intensité = " << c.intensity << "\n";
+        }
+    }
+
+    // Copies pour lambda
+    const auto circlesCopy = circles;
+    const auto binaryCopy = binaryImage;
+
+    img->OnImageUpdate([=](int x, int y, int, int, Uint32& outPixel) {
+        outPixel = 0xFF000000; // noir
+
+        if (x < 0 || x >= w || y < 0 || y >= h) return;
+
+        if (binaryCopy[y * w + x] == 255) {
+            outPixel = 0xFFFFFFFF; // blanc
+        }
+
+        for (const auto& c : circlesCopy) {
+            int dx = x - static_cast<int>(c.xc);
+            int dy = y - static_cast<int>(c.yc);
+            int d2 = dx * dx + dy * dy;
+            int r2 = static_cast<int>(c.radius * c.radius);
+            if (std::abs(d2 - r2) <= 2 * static_cast<int>(c.radius)) {
+                outPixel = 0xFFFF0000; // rouge
+            }
+        }
+
+        for (const auto& c : circlesCopy) {
+            int cx = static_cast<int>(c.xc);
+            int cy = static_cast<int>(c.yc);
+            if (std::abs(x - cx) <= 1 && std::abs(y - cy) <= 1) {
+                outPixel = 0xFF0000FF; // bleu
+            }
+        }
+    });
+}
+void Test_Cercles::OnAppRender() {
+    img->OnImageRender();
+}
+void Test_Cercles::OnAppDestroy() {}
+
+extern "C" EngineManager* createApp() {
+    auto* app = new Test_Cercles();
+    app->SetAppName("Test_Cercles");
+    return app;
+}
+
+
+
+
+
+
+
+// En Cercle  
+    // Affectation simple : tri par coordonnée Y, puis X
+    std::sort(circles.begin(), circles.end(), [](const Circle& a, const Circle& b) {
+        if (std::abs(a.yc - b.yc) > 10)
+            return a.yc < b.yc;
+        return a.xc < b.xc;
+    });
+
+    for (int i = 0; i < nbCircles; ++i) {
+        circles[i].id = i + 1;
+        circles[i].label = std::string(1, 'A' + (i % 26));
+        circles[i].intensity = 1.0f - i / static_cast<float>(std::max(nbCircles - 1, 1));
+    }
